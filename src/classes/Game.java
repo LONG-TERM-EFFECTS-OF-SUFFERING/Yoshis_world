@@ -43,6 +43,30 @@ public class Game {
 		System.out.println("Machine " + machine);
 	}
 
+	/**
+	 * Returns the number of rows in the game.
+	 *
+	 * @return the number of rows
+	 */
+	public int get_rows() {
+		return rows;
+	}
+
+	/**
+	 * Returns the number of columns in the game.
+	 *
+	 * @return the number of columns
+	 */
+	public int get_columns() {
+		return columns;
+	}
+
+	/**
+	 * Checks if the given coordinate is a valid coordinate to move in.
+	 *
+	 * @param coordinate The coordinate to check
+	 * @return true if the coordinate is valid to move in, false otherwise
+	 */
 	private boolean is_valid_cordinate_to_move_in(Coordinate coordinate) {
 		int x = coordinate.get_x();
 		int y = coordinate.get_y();
@@ -54,6 +78,12 @@ public class Game {
 				machine_tiles.indexOf(coordinate) == -1;
 	}
 
+	/**
+	 * Returns a list of available coordinates for a given turn.
+	 *
+	 * @param turn The turn (PLAYER or MACHINE) for which to find available coordinates.
+	 * @return A list of Coordinate objects representing the available coordinates.
+	 */
 	public List <Coordinate> get_available_coordinates(Turn turn) {
 		List <Coordinate> coordinates = new ArrayList <>();
 		Coordinate coordinate = null;
@@ -67,14 +97,14 @@ public class Game {
 		int y = coordinate.get_y();
 
 		/*
-		 * (x - 1,y - 2) up left      -> |((x - 1) - x)| + |(y - 2) - y)| = 3
-		 * (x + 1,y - 2) up right     -> |((x + 1) - x)| + |(y - 2) - y)| = 3
-		 * (x + 2,y - 1) right up     -> |((x + 2) - x)| + |(y - 1) - y)| = 3
-		 * (x + 2,y + 1) right bottom -> |((x + 2) - x)| + |(y + 1) - y)| = 3
-		 * (x + 1,y + 2) buttom right -> |((x + 1) - x)| + |(y + 2) - y)| = 3
-		 * (x - 1,y + 2) buttom left  -> |((x - 1) - x)| + |(y + 2) - y)| = 3
-		 * (x - 2,y + 1) left bottom  -> |((x - 2) - x)| + |(y + 1) - y)| = 3
-		 * (x - 2,y - 1) left up      -> |((x - 2) - x)| + |(y - 1) - y)| = 3
+		 * (x - 1,y - 2) -> |((x - 1) - x)| + |(y - 2) - y)| = 3
+		 * (x + 1,y - 2) -> |((x + 1) - x)| + |(y - 2) - y)| = 3
+		 * (x + 2,y - 1) -> |((x + 2) - x)| + |(y - 1) - y)| = 3
+		 * (x + 2,y + 1) -> |((x + 2) - x)| + |(y + 1) - y)| = 3
+		 * (x + 1,y + 2) -> |((x + 1) - x)| + |(y + 2) - y)| = 3
+		 * (x - 1,y + 2) -> |((x - 1) - x)| + |(y + 2) - y)| = 3
+		 * (x - 2,y + 1) -> |((x - 2) - x)| + |(y + 1) - y)| = 3
+		 * (x - 2,y - 1) -> |((x - 2) - x)| + |(y - 1) - y)| = 3
 		 */
 		for (int i = x - 2; i <= x + 2; i++) {
 			for (int j = y - 2; j <= y + 2; j++) {
@@ -93,6 +123,9 @@ public class Game {
 		return coordinates;
 	}
 
+	/**
+	 * Represents the turn in the game.
+	 */
 	static public enum Turn {
 		PLAYER,
 		MACHINE

@@ -24,17 +24,22 @@ public class MenuWindow extends JFrame implements ActionListener {
 		setIconImage(new ImageIcon("./src/assets/icon.png").getImage());
 
 		JPanel main_panel = new JPanel();
-		main_panel.setLayout(new GridLayout(2, 2));
+		main_panel.setLayout(new GridLayout(2, 1));
+
+		JPanel difficulty_selection_panel = new JPanel();
+		difficulty_selection_panel.setLayout(new GridLayout(1, 2));
 
 		JLabel title_label = new JLabel("Select the difficulty:");
-		main_panel.add(title_label);
+		difficulty_selection_panel.add(title_label);
 
 		String[] difficulties = { "Normal", "Medium", "Hard" };
 		difficulty_combo_box = new JComboBox <>(difficulties);
-		main_panel.add(difficulty_combo_box);
+		difficulty_selection_panel.add(difficulty_combo_box);
 
 		start_button = new JButton("Start game");
 		start_button.addActionListener(this);
+
+		main_panel.add(difficulty_selection_panel);
 		main_panel.add(start_button);
 
 		add(main_panel);
