@@ -9,6 +9,7 @@ import java.util.Map;
 public class ImageCollection {
 	private Map <String, ImageIcon> images = new HashMap <String, ImageIcon>() {
 		{
+			put("available_tile", new ImageIcon("./src/assets/available_tile.png"));
 			put("free_tile", new ImageIcon("./src/assets/free_tile.png"));
 			put("machine", new ImageIcon("./src/assets/machine.png"));
 			put("machine_tile", new ImageIcon("./src/assets/machine_tile.png"));

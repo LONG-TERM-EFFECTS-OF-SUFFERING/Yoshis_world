@@ -6,6 +6,8 @@ import java.util.Random;
 
 
 public class Game {
+	private Difficulty difficulty;
+	private Player winner = null;
 	private Coordinate player = null;
 	private Coordinate machine = null;
 	private int columns;
@@ -15,7 +17,8 @@ public class Game {
 	private List <Coordinate> free_tiles = new ArrayList<>();
 
 
-	public Game(int rows, int columns) {
+	public Game(Difficulty difficulty, int rows, int columns) {
+		this.difficulty = difficulty;
 		this.rows = rows;
 		this.columns = columns;
 
@@ -39,14 +42,22 @@ public class Game {
 					free_tiles.add(coordinate);
 			}
 
-		System.out.println("Player " + player);
-		System.out.println("Machine " + machine);
+		play(null);
+	}
+
+	/**
+	 * Returns the winner of the game.
+	 *
+	 * @return the winner of the game.
+	 */
+	public Player get_winner() {
+		return winner;
 	}
 
 	/**
 	 * Returns the number of rows in the game.
 	 *
-	 * @return the number of rows
+	 * @return the number of rows.
 	 */
 	public int get_rows() {
 		return rows;
@@ -55,10 +66,55 @@ public class Game {
 	/**
 	 * Returns the number of columns in the game.
 	 *
-	 * @return the number of columns
+	 * @return the number of columns.
 	 */
 	public int get_columns() {
 		return columns;
+	}
+
+	/**
+	 * Returns the player's coordinetes in the game.
+	 *
+	 * @return the player's coordinetes.
+	 */
+	public Coordinate get_player() {
+		return player;
+	}
+
+	/**
+	 * Returns the machine's coordinetes in the game.
+	 *
+	 * @return the machine's coordinetes.
+	 */
+	public Coordinate get_machine() {
+		return machine;
+	}
+
+	/**
+	 * Returns the list of player tiles.
+	 *
+	 * @return the list of player tiles.
+	 */
+	public List <Coordinate> get_player_tiles() {
+		return player_tiles;
+	}
+
+	/**
+	 * Returns the list of machine tiles.
+	 *
+	 * @return the list of machine tiles.
+	 */
+	public List <Coordinate> get_machine_tiles() {
+		return machine_tiles;
+	}
+
+	/**
+	 * Returns the list of free tiles.
+	 *
+	 * @return the list of free tiles.
+	 */
+	public List <Coordinate> get_free_tiles() {
+		return free_tiles;
 	}
 
 	/**
@@ -84,11 +140,11 @@ public class Game {
 	 * @param turn The turn (PLAYER or MACHINE) for which to find available coordinates.
 	 * @return A list of Coordinate objects representing the available coordinates.
 	 */
-	public List <Coordinate> get_available_coordinates(Turn turn) {
+	public List <Coordinate> get_available_tiles(Player turn) {
 		List <Coordinate> coordinates = new ArrayList <>();
 		Coordinate coordinate = null;
 
-		if (turn == Turn.PLAYER)
+		if (turn == Player.HUMAN)
 			coordinate = player;
 		else
 			coordinate = machine;
@@ -109,25 +165,84 @@ public class Game {
 		for (int i = x - 2; i <= x + 2; i++) {
 			for (int j = y - 2; j <= y + 2; j++) {
 				if (Math.abs(i - x) + Math.abs(j - y) == 3) {
-					Coordinate possible_coordinate = new Coordinate(i, j);
+					Coordinate possible_tile = new Coordinate(i, j);
 
-					if (is_valid_cordinate_to_move_in(possible_coordinate))
-						coordinates.add(possible_coordinate);
+					if (is_valid_cordinate_to_move_in(possible_tile) &&
+						free_tiles.indexOf(possible_tile) != -1)
+						coordinates.add(possible_tile);
 				}
 			}
 		}
 
-		for (Coordinate coordinate_ : coordinates)
-			System.out.println(coordinate_);
-
 		return coordinates;
 	}
 
+
 	/**
-	 * Represents the turn in the game.
+	 * Plays a move in the game by placing a tile on the board.
+	 * If the given tile is null, the method selects a random available tile for the machine player and places it on the board.
+	 * If the given tile is not null, the method places the tile on the board for the human player.
+	 *
+	 * @param tile The tile to be placed on the board. If null, a random available tile is selected for the machine player.
+	 * @return true if the move was successfully played, false otherwise.
 	 */
-	static public enum Turn {
-		PLAYER,
+	public boolean play(Coordinate tile) {
+		if (tile == null) {
+			List <Coordinate> available_machine_tiles = get_available_tiles(Player.MACHINE);
+
+			if (available_machine_tiles.size() != 0) {
+				tile = available_machine_tiles.get(new Random().nextInt(available_machine_tiles.size()));
+
+				machine_tiles.add(tile);
+				free_tiles.remove(tile);
+
+				machine = tile;
+
+				return true;
+			} else
+				return false;
+
+		} else {
+			player_tiles.add(tile);
+			free_tiles.remove(tile);
+
+			player = tile;
+
+			return true;
+		}
+	}
+
+	/**
+	 * Checks if the game has finished.
+	 * The game is considered finished when there are no available tiles for both the machine player and the human player.
+	 * The winner is determined by comparing the number of tiles each player has.
+	 *
+	 * @return true if the game is finished, false otherwise
+	 */
+	public boolean is_game_finished() {
+		if (get_available_tiles(Player.MACHINE).size() == 0 &&
+			get_available_tiles(Player.HUMAN).size() == 0) {
+			winner = player_tiles.size() > machine_tiles.size() ? Player.HUMAN : Player.MACHINE;
+
+			return true;
+		} else
+			return false;
+	}
+
+	/**
+	 * Represents the difficulty levels of the game.
+	 */
+	static public enum Difficulty {
+		NORMAL,
+		MEDIUM,
+		HARD
+	}
+
+	/**
+	 * Represents the players in the game.
+	 */
+	static public enum Player {
+		HUMAN,
 		MACHINE
 	}
 }

@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+import src.classes.Game.Difficulty;
+
 
 public class MenuWindow extends JFrame implements ActionListener {
 	private JButton start_button;
@@ -23,8 +25,7 @@ public class MenuWindow extends JFrame implements ActionListener {
 		setResizable(false);
 		setIconImage(new ImageIcon("./src/assets/icon.png").getImage());
 
-		JPanel main_panel = new JPanel();
-		main_panel.setLayout(new GridLayout(2, 1));
+		setLayout(new GridLayout(2, 1));
 
 		JPanel difficulty_selection_panel = new JPanel();
 		difficulty_selection_panel.setLayout(new GridLayout(1, 2));
@@ -39,10 +40,9 @@ public class MenuWindow extends JFrame implements ActionListener {
 		start_button = new JButton("Start game");
 		start_button.addActionListener(this);
 
-		main_panel.add(difficulty_selection_panel);
-		main_panel.add(start_button);
+		add(difficulty_selection_panel);
+		add(start_button);
 
-		add(main_panel);
 		setLocationRelativeTo(null);
 	}
 
@@ -54,16 +54,17 @@ public class MenuWindow extends JFrame implements ActionListener {
 		switch (button_name) {
 			case "Start game" -> {
 				String selected_difficulty = (String) difficulty_combo_box.getSelectedItem();
+				Difficulty difficulty;
 
 				switch (selected_difficulty) {
-					case "Normal" -> System.out.println("Normal");
-					case "Medium" -> System.out.println("Medium");
-					case "Hard" -> System.out.println("Hard");
+					case "Normal" -> difficulty = Difficulty.NORMAL;
+					case "Medium" -> difficulty = Difficulty.MEDIUM;
+					case "Hard" -> difficulty = Difficulty.HARD;
 					default -> throw new IllegalArgumentException("Invalid difficulty selected");
 				}
 
 				dispose();
-				GameWindow game_window = new GameWindow(10, 10);
+				GameWindow game_window = new GameWindow(difficulty, 6, 5);
 				game_window.setVisible(true);
 			}
 		}

@@ -1,6 +1,8 @@
 package src.windows;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -8,23 +10,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import src.classes.Coordinate;
 import src.classes.Game;
-import src.classes.Game.Turn;
 import src.classes.ImageCollection;
+import src.classes.Game.Difficulty;
+import src.classes.Game.Player;
 
 
 public class GameWindow extends JFrame implements ActionListener {
 	private ImageCollection image_collection;
+	private Difficulty difficulty;
 	private Game game;
 	private int window_height;
 	private int window_width;
@@ -35,14 +42,17 @@ public class GameWindow extends JFrame implements ActionListener {
 	private JLabel machine_tiles_counter;
 	private JButton menu_button;
 	private JButton new_game_button;
+	private List <Coordinate> available_player_tiles;
+	private JDialog information_dialog;
 
 
-	public GameWindow(int rows, int columns) {
+	public GameWindow(Difficulty difficulty, int rows, int columns) {
+		this.difficulty = difficulty;
 		this.rows = rows;
 		this.columns = columns;
 
-		game = new Game(rows, columns);
-		game.get_available_coordinates(Turn.PLAYER);
+		game = new Game(difficulty, rows, columns);
+		available_player_tiles = game.get_available_tiles(Player.HUMAN);
 
 		Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 		int screen_width = (int) screen_size.getWidth();
@@ -88,8 +98,8 @@ public class GameWindow extends JFrame implements ActionListener {
 		menu_button.addActionListener(this);
 		new_game_button.addActionListener(this);
 
-		buttons_panel.add(new_game_button);
 		buttons_panel.add(menu_button);
+		buttons_panel.add(new_game_button);
 
 		main_panel.add(labels_panel);
 		main_panel.add(buttons_panel);
@@ -97,7 +107,6 @@ public class GameWindow extends JFrame implements ActionListener {
 		for (int i = 0; i < rows * columns; i++) {
 			JLabel label = new JLabel();
 			label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-			label.setSize(grid_label_width, grid_label_height);
 			label.addMouseListener(new JlabelClickListener());
 
 			grid_panel.add(label);
@@ -105,6 +114,98 @@ public class GameWindow extends JFrame implements ActionListener {
 
 		add(main_panel);
 		setLocationRelativeTo(null);
+
+		update_grid();
+	}
+
+	/**
+	 * Updates the grid panel with the current state of the game.
+	 * This method sets the appropriate icons for each tile on the grid panel based
+	 * on the game state.
+	 */
+	private void update_grid() {
+		Coordinate player = game.get_player();
+		Coordinate machine = game.get_machine();
+
+		List <Coordinate> player_tiles = game.get_player_tiles();
+		List <Coordinate> machine_tiles = game.get_machine_tiles();
+		List <Coordinate> free_tiles = game.get_free_tiles();
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				JLabel label = (JLabel) grid_panel.getComponent(i * columns + j);
+				Coordinate coordinate = new Coordinate(j, i);
+				ImageIcon icon;
+
+				if (available_player_tiles.indexOf(coordinate) != -1)
+					icon = image_collection.get_image_icon("available_tile");
+				else if (coordinate.equals(player))
+					icon = image_collection.get_image_icon("player");
+				else if (coordinate.equals(machine))
+					icon = image_collection.get_image_icon("machine");
+				else if (free_tiles.indexOf(coordinate) != -1)
+					icon = image_collection.get_image_icon("free_tile");
+				else if (machine_tiles.indexOf(coordinate) != -1)
+					icon = image_collection.get_image_icon("machine_tile");
+				else if (player_tiles.indexOf(coordinate) != -1)
+					icon = image_collection.get_image_icon("player_tile");
+				else
+					throw new IllegalArgumentException("Invalid coordinate");
+
+				label.setIcon(icon);
+			}
+		}
+	}
+
+	/**
+	 * Plays a turn in the game by selecting a tile and updating the grid.
+	 *
+	 * @param tile the coordinate of the tile to be played
+	 */
+	public void play(Coordinate tile) {
+		game.play(tile);
+
+		boolean was_succesful;
+
+		do {
+			was_succesful = game.play(null);
+			available_player_tiles = game.get_available_tiles(Player.HUMAN);
+		} while (available_player_tiles.size() == 0 && was_succesful);
+
+		update_grid();
+
+		if (game.is_game_finished())
+			display_game_information();
+	}
+
+	private void display_game_information() {
+		information_dialog = new JDialog(this, "Game information", true);
+		information_dialog.setSize((int) (window_width * 0.5), (int) (window_height * 0.3));
+		information_dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		information_dialog.setResizable(false);
+
+		JPanel information_panel = new JPanel();
+		information_panel.setLayout(new BoxLayout(information_panel, BoxLayout.Y_AXIS));
+
+		JLabel player_tiles_label = new JLabel("Player tiles: " + game.get_player_tiles().size());
+		player_tiles_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		JLabel machine_tiles_label = new JLabel("Machine tiles: " + game.get_machine_tiles().size());
+		machine_tiles_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		JLabel winner_label = new JLabel("Winner: " +
+										(game.get_winner() == Player.HUMAN ? "human" : "machine"));
+		winner_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		information_panel.add(Box.createVerticalGlue());
+		information_panel.add(player_tiles_label);
+		information_panel.add(machine_tiles_label);
+		information_panel.add(winner_label);
+		information_panel.add(Box.createVerticalGlue());
+
+		information_dialog.add(information_panel, BorderLayout.CENTER);
+
+		information_dialog.setVisible(true);
 	}
 
 	@Override
@@ -114,13 +215,13 @@ public class GameWindow extends JFrame implements ActionListener {
 		switch (button_name) {
 			case "Menu" -> {
 				dispose();
-				MenuWindow menuWindow = new MenuWindow();
-				menuWindow.setVisible(true);
+				MenuWindow menu_window = new MenuWindow();
+				menu_window.setVisible(true);
 			}
 			case "New game" -> {
 				dispose();
-				GameWindow gameWindow = new GameWindow(rows, columns);
-				gameWindow.setVisible(true);
+				GameWindow game_window = new GameWindow(difficulty, rows, columns);
+				game_window.setVisible(true);
 			}
 		}
 	}
@@ -130,11 +231,23 @@ public class GameWindow extends JFrame implements ActionListener {
 		public void mouseClicked(MouseEvent e) {
 			JLabel label = (JLabel) e.getSource();
 
+			System.out.println(grid_panel.getComponentZOrder(label));
 			int label_index = grid_panel.getComponentZOrder(label);
-			int row = label_index / columns;
-			int column = label_index % columns;
+			int row = label_index % columns;
+			int column = label_index / columns;
 
-			System.out.println("Clicked tile (" + row + "," + column + ")");
+			Coordinate tile = new Coordinate(row, column);
+
+			System.out.println("Player: " + game.get_player());
+			System.out.println("Machine: " + game.get_machine());
+			System.out.println("Pressed tile: " + tile);
+
+			System.out.println("Available tiles");
+			for (Coordinate coordinate : available_player_tiles)
+				System.out.println(coordinate);
+
+			if (available_player_tiles.indexOf(tile) != -1)
+				play(tile);
 		}
 	}
 }
