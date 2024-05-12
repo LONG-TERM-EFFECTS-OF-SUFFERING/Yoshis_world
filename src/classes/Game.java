@@ -6,15 +6,15 @@ import java.util.Random;
 
 
 public class Game {
-	private Difficulty difficulty;
-	private Player winner = null;
-	private Coordinate player = null;
 	private Coordinate machine = null;
+	private Coordinate player = null;
+	private Difficulty difficulty;
 	private int columns;
 	private int rows;
-	private List <Coordinate> player_tiles = new ArrayList <>();
+	private List <Coordinate> free_tiles = new ArrayList <>();
 	private List <Coordinate> machine_tiles = new ArrayList <>();
-	private List <Coordinate> free_tiles = new ArrayList<>();
+	private List <Coordinate> player_tiles = new ArrayList <>();
+	private Player winner = null;
 
 
 	public Game(Difficulty difficulty, int rows, int columns) {
@@ -45,31 +45,14 @@ public class Game {
 		play(null);
 	}
 
-	/**
-	 * Returns the winner of the game.
-	 *
-	 * @return the winner of the game.
-	 */
-	public Player get_winner() {
-		return winner;
-	}
 
 	/**
-	 * Returns the number of rows in the game.
+	 * Returns the machine's coordinetes in the game.
 	 *
-	 * @return the number of rows.
+	 * @return the machine's coordinetes.
 	 */
-	public int get_rows() {
-		return rows;
-	}
-
-	/**
-	 * Returns the number of columns in the game.
-	 *
-	 * @return the number of columns.
-	 */
-	public int get_columns() {
-		return columns;
+	public Coordinate get_machine() {
+		return machine;
 	}
 
 	/**
@@ -82,21 +65,39 @@ public class Game {
 	}
 
 	/**
-	 * Returns the machine's coordinetes in the game.
+	 * Returns the difficulty of the game.
 	 *
-	 * @return the machine's coordinetes.
+	 * @return the difficulty of the game.
 	 */
-	public Coordinate get_machine() {
-		return machine;
+	public Difficulty get_difficulty() {
+		return difficulty;
 	}
 
 	/**
-	 * Returns the list of player tiles.
+	 * Returns the number of columns in the game.
 	 *
-	 * @return the list of player tiles.
+	 * @return the number of columns.
 	 */
-	public List <Coordinate> get_player_tiles() {
-		return player_tiles;
+	public int get_columns() {
+		return columns;
+	}
+
+	/**
+	 * Returns the number of rows in the game.
+	 *
+	 * @return the number of rows.
+	 */
+	public int get_rows() {
+		return rows;
+	}
+
+	/**
+	 * Returns the list of free tiles.
+	 *
+	 * @return the list of free tiles.
+	 */
+	public List <Coordinate> get_free_tiles() {
+		return free_tiles;
 	}
 
 	/**
@@ -109,12 +110,26 @@ public class Game {
 	}
 
 	/**
-	 * Returns the list of free tiles.
+	 * Returns the list of player tiles.
 	 *
-	 * @return the list of free tiles.
+	 * @return the list of player tiles.
 	 */
-	public List <Coordinate> get_free_tiles() {
-		return free_tiles;
+	public List <Coordinate> get_player_tiles() {
+		return player_tiles;
+	}
+
+	/**
+	 * Returns the winner of the game as a string.
+	 *
+	 * @return the winner of the game as a string ("human", "machine", or "tie").
+	 */
+	public String get_winner() {
+		if (winner == Player.HUMAN)
+			return "human";
+		else if (winner == Player.MACHINE)
+			return "machine";
+		else
+			return "tie";
 	}
 
 	/**
@@ -222,12 +237,17 @@ public class Game {
 	public boolean is_game_finished() {
 		if (get_available_tiles(Player.MACHINE).size() == 0 &&
 			get_available_tiles(Player.HUMAN).size() == 0) {
-			winner = player_tiles.size() > machine_tiles.size() ? Player.HUMAN : Player.MACHINE;
+
+			if (player_tiles.size() > machine_tiles.size())
+				winner = Player.HUMAN;
+			else if (player_tiles.size() < machine_tiles.size())
+				winner = Player.MACHINE;
 
 			return true;
 		} else
 			return false;
 	}
+
 
 	/**
 	 * Represents the difficulty levels of the game.

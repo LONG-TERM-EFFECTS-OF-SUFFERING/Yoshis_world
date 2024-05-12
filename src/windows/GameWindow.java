@@ -30,20 +30,20 @@ import src.classes.Game.Player;
 
 
 public class GameWindow extends JFrame implements ActionListener {
-	private ImageCollection image_collection;
 	private Difficulty difficulty;
 	private Game game;
+	private ImageCollection image_collection;
+	private int columns;
+	private int rows;
 	private int window_height;
 	private int window_width;
-	private int rows;
-	private int columns;
-	private JPanel grid_panel;
-	private JLabel player_tiles_counter;
-	private JLabel machine_tiles_counter;
 	private JButton menu_button;
 	private JButton new_game_button;
-	private List <Coordinate> available_player_tiles;
 	private JDialog information_dialog;
+	private JLabel machine_tiles_counter;
+	private JLabel player_tiles_counter;
+	private JPanel grid_panel;
+	private List <Coordinate> available_player_tiles;
 
 
 	public GameWindow(Difficulty difficulty, int rows, int columns) {
@@ -187,17 +187,30 @@ public class GameWindow extends JFrame implements ActionListener {
 		JPanel information_panel = new JPanel();
 		information_panel.setLayout(new BoxLayout(information_panel, BoxLayout.Y_AXIS));
 
+		Difficulty difficulty = game.get_difficulty();
+		String string_difficulty;
+
+		if (difficulty == Difficulty.NORMAL)
+			string_difficulty = "normal";
+		else if (difficulty == Difficulty.MEDIUM)
+			string_difficulty = "medium";
+		else
+			string_difficulty = "hard";
+
+		JLabel difficulty_label = new JLabel("Difficulty: " + string_difficulty);
+		difficulty_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
 		JLabel player_tiles_label = new JLabel("Player tiles: " + game.get_player_tiles().size());
 		player_tiles_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		JLabel machine_tiles_label = new JLabel("Machine tiles: " + game.get_machine_tiles().size());
 		machine_tiles_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JLabel winner_label = new JLabel("Winner: " +
-										(game.get_winner() == Player.HUMAN ? "human" : "machine"));
+		JLabel winner_label = new JLabel("Winner: " + game.get_winner());
 		winner_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		information_panel.add(Box.createVerticalGlue());
+		information_panel.add(difficulty_label);
 		information_panel.add(player_tiles_label);
 		information_panel.add(machine_tiles_label);
 		information_panel.add(winner_label);
