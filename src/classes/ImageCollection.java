@@ -36,7 +36,7 @@ public class ImageCollection {
 	 * Returns the image icon associated with the given name.
 	 *
 	 * @param name The name of the image icon to retrieve.
-	 * @return The image icon associated with the given name, or null if not found.
+	 * @return the image icon associated with the given name, or null if not found.
 	 */
 	public ImageIcon get_image_icon(String name) {
 		return images.get(name);

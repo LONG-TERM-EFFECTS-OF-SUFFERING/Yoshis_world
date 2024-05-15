@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import src.classes.GameState.Player;
+
 
 public class Game {
-	private Coordinate machine = null;
-	private Coordinate player = null;
 	private Difficulty difficulty;
 	private int columns;
 	private int rows;
-	private List <Coordinate> free_tiles = new ArrayList <>();
-	private List <Coordinate> machine_tiles = new ArrayList <>();
-	private List <Coordinate> player_tiles = new ArrayList <>();
 	private Player winner = null;
 
 
@@ -21,47 +18,35 @@ public class Game {
 		this.difficulty = difficulty;
 		this.rows = rows;
 		this.columns = columns;
+	}
 
+
+	public GameState build_initial_game_state() {
 		Random random = new Random();
 
-		player = new Coordinate(random.nextInt(columns), random.nextInt(rows));
-		machine = new Coordinate(random.nextInt(columns), random.nextInt(rows));
+		Coordinate green_yoshi = new Coordinate(random.nextInt(columns), random.nextInt(rows));
+		Coordinate red_yoshi = new Coordinate(random.nextInt(columns), random.nextInt(rows));
 
-		while(player.equals(machine))
-			machine = new Coordinate(random.nextInt(columns), random.nextInt(rows));
+		while (green_yoshi.equals(red_yoshi))
+			red_yoshi = new Coordinate(random.nextInt(columns), random.nextInt(rows));
 
-		player_tiles.add(player);
-		machine_tiles.add(machine);
+		List <Coordinate> free_tiles = new ArrayList <>();
+		List <Coordinate> green_yoshi_tiles = new ArrayList <>();
+		List <Coordinate> red_yoshi_tiles = new ArrayList <>();
+
+		green_yoshi_tiles.add(green_yoshi);
+		red_yoshi_tiles.add(red_yoshi);
 
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < columns; j++) {
 				Coordinate coordinate = new Coordinate(j, i);
 
-				if (!coordinate.equals(player) &&
-					!coordinate.equals(machine))
+				if (!coordinate.equals(green_yoshi) &&
+						!coordinate.equals(red_yoshi))
 					free_tiles.add(coordinate);
 			}
 
-		play(null);
-	}
-
-
-	/**
-	 * Returns the machine's coordinetes in the game.
-	 *
-	 * @return the machine's coordinetes.
-	 */
-	public Coordinate get_machine() {
-		return machine;
-	}
-
-	/**
-	 * Returns the player's coordinetes in the game.
-	 *
-	 * @return the player's coordinetes.
-	 */
-	public Coordinate get_player() {
-		return player;
+		return new GameState(green_yoshi, red_yoshi, free_tiles, red_yoshi_tiles, green_yoshi_tiles);
 	}
 
 	/**
@@ -92,77 +77,55 @@ public class Game {
 	}
 
 	/**
-	 * Returns the list of free tiles.
-	 *
-	 * @return the list of free tiles.
-	 */
-	public List <Coordinate> get_free_tiles() {
-		return free_tiles;
-	}
-
-	/**
-	 * Returns the list of machine tiles.
-	 *
-	 * @return the list of machine tiles.
-	 */
-	public List <Coordinate> get_machine_tiles() {
-		return machine_tiles;
-	}
-
-	/**
-	 * Returns the list of player tiles.
-	 *
-	 * @return the list of player tiles.
-	 */
-	public List <Coordinate> get_player_tiles() {
-		return player_tiles;
-	}
-
-	/**
 	 * Returns the winner of the game as a string.
 	 *
 	 * @return the winner of the game as a string ("human", "machine", or "tie").
 	 */
 	public String get_winner() {
-		if (winner == Player.HUMAN)
+		if (winner == Player.GREEN)
 			return "human";
-		else if (winner == Player.MACHINE)
+		else if (winner == Player.RED)
 			return "machine";
 		else
 			return "tie";
 	}
 
 	/**
-	 * Checks if the given coordinate is a valid coordinate to move in.
+	 * Checks if a given coordinate is a valid coordinate to move in a given
+	 * game state.
+	 * A coordinate is considered valid if it is within the board boundaries
+	 * and not occupied by any player.
 	 *
-	 * @param coordinate The coordinate to check
-	 * @return true if the coordinate is valid to move in, false otherwise
+	 * @param coordinate The coordinate to check.
+	 * @param game_state A game state.
+	 * @return true if the coordinate is valid to move in, false otherwise.
 	 */
-	private boolean is_valid_cordinate_to_move_in(Coordinate coordinate) {
+	private boolean is_valid_cordinate_to_move_in(Coordinate coordinate, GameState game_state) {
 		int x = coordinate.get_x();
 		int y = coordinate.get_y();
 
 		boolean is_in_board = 0 <= y && y < rows && 0 <= x && x < columns;
 
 		return is_in_board &&
-				player_tiles.indexOf(coordinate) == -1 &&
-				machine_tiles.indexOf(coordinate) == -1;
+				game_state.get_tiles(Player.GREEN).indexOf(coordinate) == -1 &&
+				game_state.get_tiles(Player.RED).indexOf(coordinate) == -1;
 	}
 
 	/**
-	 * Returns a list of available coordinates for a given turn.
+	 * Returns the list of available tiles for the given player in a game state.
 	 *
-	 * @param turn The turn (PLAYER or MACHINE) for which to find available coordinates.
-	 * @return A list of Coordinate objects representing the available coordinates.
+	 * @param player The player for whom to find available tiles.
+	 * @param game_state A game state.
+	 * @return a list of available tiles for the given player.
 	 */
-	public List <Coordinate> get_available_tiles(Player turn) {
+	public List <Coordinate> get_available_tiles(Player player, GameState game_state) {
 		List <Coordinate> coordinates = new ArrayList <>();
 		Coordinate coordinate = null;
 
-		if (turn == Player.HUMAN)
-			coordinate = player;
+		if (player == Player.GREEN)
+			coordinate = game_state.get_player(Player.GREEN);
 		else
-			coordinate = machine;
+			coordinate = game_state.get_player(Player.RED);
 
 		int x = coordinate.get_x();
 		int y = coordinate.get_y();
@@ -182,8 +145,8 @@ public class Game {
 				if (Math.abs(i - x) + Math.abs(j - y) == 3) {
 					Coordinate possible_tile = new Coordinate(i, j);
 
-					if (is_valid_cordinate_to_move_in(possible_tile) &&
-						free_tiles.indexOf(possible_tile) != -1)
+					if (is_valid_cordinate_to_move_in(possible_tile, game_state) &&
+						game_state.get_tiles(null).indexOf(possible_tile) != -1)
 						coordinates.add(possible_tile);
 				}
 			}
@@ -192,56 +155,44 @@ public class Game {
 		return coordinates;
 	}
 
-
 	/**
-	 * Plays a move in the game by placing a tile on the board.
-	 * If the given tile is null, the method selects a random available tile for the machine player and places it on the board.
-	 * If the given tile is not null, the method places the tile on the board for the human player.
+	 * Plays a game by moving the given player to the specified tile in a copy
+	 * of the given game state.
 	 *
-	 * @param tile The tile to be placed on the board. If null, a random available tile is selected for the machine player.
-	 * @return true if the move was successfully played, false otherwise.
+	 *
+	 * @param player     the player object representing the player in the game
+	 * @param tile       the coordinate of the tile to move the player to.
+	 * @param game_state A game state.
+	 * @return the game state in which the move was made.
 	 */
-	public boolean play(Coordinate tile) {
-		if (tile == null) {
-			List <Coordinate> available_machine_tiles = get_available_tiles(Player.MACHINE);
+	public GameState play(Player player, Coordinate tile, GameState game_state) {
+		GameState game_state_copy = game_state.copy();
 
-			if (available_machine_tiles.size() != 0) {
-				tile = available_machine_tiles.get(new Random().nextInt(available_machine_tiles.size()));
+		game_state_copy.move_to_tile(player, tile);
 
-				machine_tiles.add(tile);
-				free_tiles.remove(tile);
-
-				machine = tile;
-
-				return true;
-			} else
-				return false;
-
-		} else {
-			player_tiles.add(tile);
-			free_tiles.remove(tile);
-
-			player = tile;
-
-			return true;
-		}
+		return game_state_copy;
 	}
 
 	/**
-	 * Checks if the game has finished.
-	 * The game is considered finished when there are no available tiles for both the machine player and the human player.
-	 * The winner is determined by comparing the number of tiles each player has.
+	 * Checks if the game is finished by determining if both players have no
+	 * available tiles left.
+	 * If the game is finished, it determines the winner based on the number of
+	 * tiles each player has.
 	 *
-	 * @return true if the game is finished, false otherwise
+	 * @param game_state A game state.
+	 * @return true if the game is finished, false otherwise.
 	 */
-	public boolean is_game_finished() {
-		if (get_available_tiles(Player.MACHINE).size() == 0 &&
-			get_available_tiles(Player.HUMAN).size() == 0) {
+	public boolean is_game_finished(GameState game_state) {
+		if (get_available_tiles(Player.GREEN, game_state).size() == 0 &&
+			get_available_tiles(Player.RED, game_state).size() == 0) {
 
-			if (player_tiles.size() > machine_tiles.size())
-				winner = Player.HUMAN;
-			else if (player_tiles.size() < machine_tiles.size())
-				winner = Player.MACHINE;
+			int green_yoshi_tiles = game_state.get_tiles(Player.GREEN).size();
+			int red_yoshi_tiles = game_state.get_tiles(Player.RED).size();
+
+			if (green_yoshi_tiles > red_yoshi_tiles)
+				winner = Player.GREEN;
+			else if (red_yoshi_tiles > green_yoshi_tiles)
+				winner = Player.RED;
 
 			return true;
 		} else
@@ -256,13 +207,5 @@ public class Game {
 		NORMAL,
 		MEDIUM,
 		HARD
-	}
-
-	/**
-	 * Represents the players in the game.
-	 */
-	static public enum Player {
-		HUMAN,
-		MACHINE
 	}
 }
