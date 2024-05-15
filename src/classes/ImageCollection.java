@@ -11,10 +11,10 @@ public class ImageCollection {
 		{
 			put("available_tile", new ImageIcon("./src/assets/available_tile.png"));
 			put("free_tile", new ImageIcon("./src/assets/free_tile.png"));
-			put("machine", new ImageIcon("./src/assets/machine.png"));
-			put("machine_tile", new ImageIcon("./src/assets/machine_tile.png"));
-			put("player", new ImageIcon("./src/assets/player.png"));
-			put("player_tile", new ImageIcon("./src/assets/player_tile.png"));
+			put("green_yoshi", new ImageIcon("./src/assets/green_yoshi.png"));
+			put("green_yoshi_tile", new ImageIcon("./src/assets/green_yoshi_tile.png"));
+			put("red_yoshi", new ImageIcon("./src/assets/red_yoshi.png"));
+			put("red_yoshi_tile", new ImageIcon("./src/assets/red_yoshi_tile.png"));
 		}
 	};
 

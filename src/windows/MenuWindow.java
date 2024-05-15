@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import src.classes.Game.Difficulty;
+import src.classes.GameState.Player;
 
 
 public class MenuWindow extends JFrame implements ActionListener {
@@ -64,7 +65,7 @@ public class MenuWindow extends JFrame implements ActionListener {
 				}
 
 				dispose();
-				GameWindow game_window = new GameWindow(difficulty, 6, 5);
+				GameWindow game_window = new GameWindow(difficulty, 6, 5, Player.RED);
 				game_window.setVisible(true);
 			}
 		}

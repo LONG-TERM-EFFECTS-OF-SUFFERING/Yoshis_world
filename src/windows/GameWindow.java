@@ -46,19 +46,23 @@ public class GameWindow extends JFrame implements ActionListener {
 	private JLabel machine_tiles_counter;
 	private JLabel player_tiles_counter;
 	private JPanel grid_panel;
-	private List <Coordinate> available_player_tiles;
+	private List <Coordinate> available_human_tiles;
 	private Minimax minimax;
+	private Player human;
+	private Player machine;
 
 
-	public GameWindow(Difficulty difficulty, int rows, int columns) {
+	public GameWindow(Difficulty difficulty, int rows, int columns, Player human) {
 		this.difficulty = difficulty;
 		this.rows = rows;
 		this.columns = columns;
+		this.human = human;
+		machine = human == Player.GREEN ? Player.RED : Player.GREEN;
 
 		game = new Game(difficulty, rows, columns);
 		game_state = game.build_initial_game_state();
-		available_player_tiles = game.get_available_tiles(Player.GREEN, game_state);
-		minimax = new Minimax(game);
+		available_human_tiles = game.get_available_tiles(human, game_state);
+		minimax = new Minimax(game, machine);
 
 		Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 		int screen_width = (int) screen_size.getWidth();
@@ -88,8 +92,8 @@ public class GameWindow extends JFrame implements ActionListener {
 		labels_panel.setLayout(new GridLayout(1, 2));
 		labels_panel.setMaximumSize(new Dimension(window_width, window_height));
 
-		player_tiles_counter = new JLabel("Player tiles: ");
-		machine_tiles_counter = new JLabel("Machine tiles: ");
+		player_tiles_counter = new JLabel("Player tiles:");
+		machine_tiles_counter = new JLabel("Machine tiles:");
 
 		labels_panel.add(player_tiles_counter);
 		labels_panel.add(machine_tiles_counter);
@@ -130,11 +134,11 @@ public class GameWindow extends JFrame implements ActionListener {
 	 * on the game state.
 	 */
 	private void update_grid() {
-		Coordinate player = game_state.get_player(Player.GREEN);
-		Coordinate machine = game_state.get_player(Player.RED);
+		Coordinate human_coordinate = game_state.get_player(human);
+		Coordinate machine_coordinate = game_state.get_player(machine);
 
-		List <Coordinate> player_tiles = game_state.get_tiles(Player.GREEN);
-		List <Coordinate> machine_tiles = game_state.get_tiles(Player.RED);
+		List <Coordinate> player_tiles = game_state.get_tiles(human);
+		List <Coordinate> machine_tiles = game_state.get_tiles(machine);
 		List <Coordinate> free_tiles = game_state.get_tiles(null);
 
 		for (int i = 0; i < rows; i++) {
@@ -143,18 +147,18 @@ public class GameWindow extends JFrame implements ActionListener {
 				Coordinate coordinate = new Coordinate(j, i);
 				ImageIcon icon;
 
-				if (available_player_tiles.indexOf(coordinate) != -1)
+				if (available_human_tiles.indexOf(coordinate) != -1)
 					icon = image_collection.get_image_icon("available_tile");
-				else if (coordinate.equals(player))
-					icon = image_collection.get_image_icon("player");
-				else if (coordinate.equals(machine))
-					icon = image_collection.get_image_icon("machine");
 				else if (free_tiles.indexOf(coordinate) != -1)
 					icon = image_collection.get_image_icon("free_tile");
+				else if (coordinate.equals(machine_coordinate))
+					icon = image_collection.get_image_icon("green_yoshi");
 				else if (machine_tiles.indexOf(coordinate) != -1)
-					icon = image_collection.get_image_icon("machine_tile");
+					icon = image_collection.get_image_icon("green_yoshi_tile");
+				else if (coordinate.equals(human_coordinate))
+					icon = image_collection.get_image_icon("red_yoshi");
 				else if (player_tiles.indexOf(coordinate) != -1)
-					icon = image_collection.get_image_icon("player_tile");
+					icon = image_collection.get_image_icon("red_yoshi_tile");
 				else
 					throw new IllegalArgumentException("Invalid coordinate");
 
@@ -164,25 +168,36 @@ public class GameWindow extends JFrame implements ActionListener {
 	}
 
 	/**
-	 * Plays a turn in the game by selecting a tile and updating the grid.
+	 * Executes a move for the human player and then for the machine.
 	 *
-	 * @param tile the coordinate of the tile to be played
+	 * This method updates the game state based on the human player's move and then
+	 * determines the machine's move using the Minimax algorithm. It updates the
+	 * available tiles for the human player, updates the game grid, and refreshes
+	 * the player and machine tile counters. If the game is finished after the
+	 * moves,
+	 * it displays the game information.
+	 *
+	 * @param human_tile The coordinate of the tile to which the human player moves.
 	 */
-	public void play(Coordinate player_tile) {
-		game_state = game.play(Player.GREEN, player_tile, game_state);
+	public void play(Coordinate human_tile) {
+		game_state = game.play(human, human_tile, game_state);
 
-		Coordinate machine_tile;
+		Coordinate machine_tile = minimax.run(game_state);
 
-		do {
-			machine_tile = minimax.run(game_state);
+		if (available_human_tiles.size() == 0)
+			while (machine_tile != null) {
+				game_state = game.play(machine, machine_tile, game_state);
+				machine_tile = minimax.run(game_state);
+			}
+		else if (machine_tile != null)
+			game_state = game.play(machine, machine_tile, game_state);
 
-			if (machine_tile != null)
-				game_state = game.play(Player.RED, machine_tile, game_state);
-
-			available_player_tiles = game.get_available_tiles(Player.GREEN, game_state);
-		} while (available_player_tiles.size() == 0 && machine_tile != null);
+		available_human_tiles = game.get_available_tiles(human, game_state);
 
 		update_grid();
+
+		player_tiles_counter.setText("Player tiles: " + game_state.get_tiles(human).size());
+		machine_tiles_counter.setText("Machine tiles: " + game_state.get_tiles(machine).size());
 
 		if (game.is_game_finished(game_state))
 			display_game_information();
@@ -210,13 +225,23 @@ public class GameWindow extends JFrame implements ActionListener {
 		JLabel difficulty_label = new JLabel("Difficulty: " + string_difficulty);
 		difficulty_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JLabel player_tiles_label = new JLabel("Player tiles: " + game_state.get_tiles(Player.GREEN).size());
+		JLabel player_tiles_label = new JLabel("Player tiles: " + game_state.get_tiles(human).size());
 		player_tiles_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JLabel machine_tiles_label = new JLabel("Machine tiles: " + game_state.get_tiles(Player.RED).size());
+		JLabel machine_tiles_label = new JLabel("Machine tiles: " + game_state.get_tiles(machine).size());
 		machine_tiles_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JLabel winner_label = new JLabel("Winner: " + game.get_winner());
+		Player winner = game.get_winner();
+		String string_winner;
+
+		if (winner == human)
+			string_winner = "human";
+		else if (winner == machine)
+			string_winner = "machine";
+		else
+			string_winner = "tie";
+
+		JLabel winner_label = new JLabel("Winner: " + string_winner);
 		winner_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		information_panel.add(Box.createVerticalGlue());
@@ -243,7 +268,7 @@ public class GameWindow extends JFrame implements ActionListener {
 			}
 			case "New game" -> {
 				dispose();
-				GameWindow game_window = new GameWindow(difficulty, rows, columns);
+				GameWindow game_window = new GameWindow(difficulty, rows, columns, human);
 				game_window.setVisible(true);
 			}
 		}
@@ -254,22 +279,27 @@ public class GameWindow extends JFrame implements ActionListener {
 		public void mouseClicked(MouseEvent e) {
 			JLabel label = (JLabel) e.getSource();
 
-			System.out.println(grid_panel.getComponentZOrder(label));
 			int label_index = grid_panel.getComponentZOrder(label);
 			int row = label_index % columns;
 			int column = label_index / columns;
 
 			Coordinate tile = new Coordinate(row, column);
 
-			System.out.println("Player: " + game_state.get_player(Player.GREEN));
-			System.out.println("Machine: " + game_state.get_player(Player.RED));
+			System.out.println(/* -------------------------------------------------------------------------- */);
+			System.out.println("Player: " + game_state.get_player(human));
+			System.out.println("Machine: " + game_state.get_player(machine));
 			System.out.println("Pressed tile: " + tile);
 
-			System.out.println("Available tiles");
-			for (Coordinate coordinate : available_player_tiles)
+			System.out.println("Available human tiles");
+			for (Coordinate coordinate : available_human_tiles)
 				System.out.println(coordinate);
 
-			if (available_player_tiles.indexOf(tile) != -1)
+			List <Coordinate> available_machine_tiles = game.get_available_tiles(machine, game_state);
+			System.out.println("Available machine tiles");
+			for (Coordinate coordinate : available_machine_tiles)
+				System.out.println(coordinate);
+
+			if (available_human_tiles.indexOf(tile) != -1)
 				play(tile);
 		}
 	}

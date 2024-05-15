@@ -21,6 +21,17 @@ public class Game {
 	}
 
 
+	/**
+	 * Builds the initial game state.
+	 *
+	 * This method initializes the game state by randomly placing the green Yoshi
+	 * and the red Yoshi on different tiles within the game board. It ensures
+	 * that the two Yoshis do not start on the same tile. It also initializes the
+	 * list of free tiles and the lists of tiles occupied by each Yoshi.
+	 *
+	 * @return the initial game state with randomly placed Yoshis and the list of
+	 *         free tiles.
+	 */
 	public GameState build_initial_game_state() {
 		Random random = new Random();
 
@@ -77,17 +88,12 @@ public class Game {
 	}
 
 	/**
-	 * Returns the winner of the game as a string.
+	 * Returns the winner of the game.
 	 *
-	 * @return the winner of the game as a string ("human", "machine", or "tie").
+	 * @return the winner of the game.
 	 */
-	public String get_winner() {
-		if (winner == Player.GREEN)
-			return "human";
-		else if (winner == Player.RED)
-			return "machine";
-		else
-			return "tie";
+	public Player get_winner() {
+		return winner;
 	}
 
 	/**
@@ -140,13 +146,14 @@ public class Game {
 		 * (x - 2,y + 1) -> |((x - 2) - x)| + |(y + 1) - y)| = 3
 		 * (x - 2,y - 1) -> |((x - 2) - x)| + |(y - 1) - y)| = 3
 		 */
+		List <Coordinate> free_tiles = game_state.get_tiles(null);
 		for (int i = x - 2; i <= x + 2; i++) {
 			for (int j = y - 2; j <= y + 2; j++) {
 				if (Math.abs(i - x) + Math.abs(j - y) == 3) {
 					Coordinate possible_tile = new Coordinate(i, j);
 
 					if (is_valid_cordinate_to_move_in(possible_tile, game_state) &&
-						game_state.get_tiles(null).indexOf(possible_tile) != -1)
+						free_tiles.indexOf(possible_tile) != -1)
 						coordinates.add(possible_tile);
 				}
 			}
@@ -158,7 +165,6 @@ public class Game {
 	/**
 	 * Plays a game by moving the given player to the specified tile in a copy
 	 * of the given game state.
-	 *
 	 *
 	 * @param player     the player object representing the player in the game
 	 * @param tile       the coordinate of the tile to move the player to.
@@ -174,8 +180,8 @@ public class Game {
 	}
 
 	/**
-	 * Checks if the game is finished by determining if both players have no
-	 * available tiles left.
+	 * Checks if the game is finished in the given game sate by determining if
+	 * both players have no available tiles left.
 	 * If the game is finished, it determines the winner based on the number of
 	 * tiles each player has.
 	 *

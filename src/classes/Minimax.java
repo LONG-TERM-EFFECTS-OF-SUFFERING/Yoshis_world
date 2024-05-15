@@ -13,10 +13,13 @@ public class Minimax {
 	private Game game;
 	private int max_depth;
 	private Node root;
+	private Player maximized_player;
 
 
-	public Minimax(Game game) {
+	public Minimax(Game game, Player maximizing_player) {
 		this.game = game;
+		this.maximized_player = maximizing_player;
+
 		Difficulty difficulty = game.get_difficulty();
 
 		if (difficulty == Difficulty.NORMAL)
@@ -41,10 +44,10 @@ public class Minimax {
 			Type type;
 
 			if (node.get_type() == Type.MAX) {
-				player = Player.RED;
+				player = maximized_player;
 				type = Type.MIN;
 			} else if (node.get_type() == Type.MIN) {
-				player = Player.GREEN;
+				player = maximized_player == Player.GREEN ? Player.RED : Player.GREEN;
 				type = Type.MAX;
 			} else
 				throw new IllegalArgumentException("Error: invalid player");
@@ -83,9 +86,8 @@ public class Minimax {
 
 		list.add(root);
 
-		for (int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++)
 			expand_node(list.get(i));
-		}
 
 		list.reversed();
 
@@ -103,15 +105,15 @@ public class Minimax {
 				if (parent.get_type() == Type.MAX)
 					if (node_utility > parent_utility) {
 						parent.set_utility(node_utility);
-						if (parent == root)
-							best_move = node.get_game_state().get_player(Player.RED); // The sons
-							// of the root will always (if it is possible) move the RED player (machine)
+
 					}
 				else
 					if (node_utility < parent_utility) {
 						parent.set_utility(node_utility);
 						if (parent == root)
-							best_move = node.get_game_state().get_player(Player.RED);
+							best_move = node.get_game_state().get_player(maximized_player); // The sons (MIN)
+						// of the root (MAX) will always (if it is possible) move the maximized player
+						// (machine)
 					}
 			}
 		}
