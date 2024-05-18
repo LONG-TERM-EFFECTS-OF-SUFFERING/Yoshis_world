@@ -23,7 +23,7 @@ public class Minimax {
 		Difficulty difficulty = game.get_difficulty();
 
 		if (difficulty == Difficulty.NORMAL)
-			max_depth = 1;
+			max_depth = 2;
 		else if (difficulty == Difficulty.MEDIUM)
 			max_depth = 4;
 		else

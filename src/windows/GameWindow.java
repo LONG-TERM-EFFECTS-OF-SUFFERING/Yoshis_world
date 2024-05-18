@@ -60,9 +60,11 @@ public class GameWindow extends JFrame implements ActionListener {
 		machine = human == Player.GREEN ? Player.RED : Player.GREEN;
 
 		game = new Game(difficulty, rows, columns);
-		game_state = game.build_initial_game_state();
-		available_human_tiles = game.get_available_tiles(human, game_state);
 		minimax = new Minimax(game, machine);
+		game_state = game.build_initial_game_state();
+		game_state = game.play(machine, minimax.run(game_state), game_state); // The first move is made by the
+																				// machine
+		available_human_tiles = game.get_available_tiles(human, game_state);
 
 		Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 		int screen_width = (int) screen_size.getWidth();
@@ -184,6 +186,9 @@ public class GameWindow extends JFrame implements ActionListener {
 
 		Coordinate machine_tile = minimax.run(game_state);
 
+		available_human_tiles = game.get_available_tiles(human, game_state); // Update after the
+																				// player move
+
 		if (available_human_tiles.size() == 0)
 			while (machine_tile != null) {
 				game_state = game.play(machine, machine_tile, game_state);
@@ -192,7 +197,8 @@ public class GameWindow extends JFrame implements ActionListener {
 		else if (machine_tile != null)
 			game_state = game.play(machine, machine_tile, game_state);
 
-		available_human_tiles = game.get_available_tiles(human, game_state);
+		available_human_tiles = game.get_available_tiles(human, game_state); // Update after the
+																				// machine move
 
 		update_grid();
 
