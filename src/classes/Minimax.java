@@ -9,7 +9,7 @@ import src.classes.Node.Type;
 
 
 public class Minimax {
-	private ArrayList <Node> list = new ArrayList<>();
+	private List <Node> list = new ArrayList <>();
 	private Game game;
 	private int max_depth;
 	private Node root;
@@ -89,7 +89,7 @@ public class Minimax {
 		for (int i = 0; i < list.size(); i++)
 			expand_node(list.get(i));
 
-		list.reversed();
+		list = list.reversed();
 
 		Coordinate best_move = null;
 
@@ -117,6 +117,8 @@ public class Minimax {
 					}
 			}
 		}
+
+		list.clear(); // Clear the list for future simulations
 
 		return best_move;
 	}

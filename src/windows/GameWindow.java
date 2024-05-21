@@ -76,7 +76,7 @@ public class GameWindow extends JFrame implements ActionListener {
 		int grid_label_width = (int) (window_width * 0.1);
 		int grid_label_height = (int) (window_height * 0.075);
 
-		setTitle("Yoshi's world - Gane");
+		setTitle("Yoshi's world - Game");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(window_width, window_height);
 		setResizable(false);
@@ -94,8 +94,8 @@ public class GameWindow extends JFrame implements ActionListener {
 		labels_panel.setLayout(new GridLayout(1, 2));
 		labels_panel.setMaximumSize(new Dimension(window_width, window_height));
 
-		player_tiles_counter = new JLabel("Player tiles:");
-		machine_tiles_counter = new JLabel("Machine tiles:");
+		player_tiles_counter = new JLabel("Player tiles: 1");
+		machine_tiles_counter = new JLabel("Machine tiles: 2");
 
 		labels_panel.add(player_tiles_counter);
 		labels_panel.add(machine_tiles_counter);
