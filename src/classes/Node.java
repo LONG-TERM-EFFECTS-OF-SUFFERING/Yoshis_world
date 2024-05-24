@@ -16,9 +16,9 @@ public class Node {
 		this.type = type;
 
 		if (type == Type.MAX)
-			utility = Integer.MAX_VALUE;
-		else
 			utility = Integer.MIN_VALUE;
+		else
+			utility = Integer.MAX_VALUE;
 	}
 
 

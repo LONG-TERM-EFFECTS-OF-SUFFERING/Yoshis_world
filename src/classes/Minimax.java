@@ -93,29 +93,25 @@ public class Minimax {
 
 		Coordinate best_move = null;
 
-		for (int i = 0; i < list.size(); i++) {
+		for (int i = 1; i < list.size() - 1; i++) {
 			Node node = list.get(i);
 			float node_utility = node.get_utility();
 
 			Node parent = node.get_parent();
 
-			if (parent != null) {
 				float parent_utility = parent.get_utility();
 
-				if (parent.get_type() == Type.MAX)
+				if (parent.get_type() == Type.MAX) {
 					if (node_utility > parent_utility) {
 						parent.set_utility(node_utility);
 
-					}
-				else
-					if (node_utility < parent_utility) {
-						parent.set_utility(node_utility);
 						if (parent == root)
-							best_move = node.get_game_state().get_player(maximized_player); // The sons (MIN)
-						// of the root (MAX) will always (if it is possible) move the maximized player
-						// (machine)
+							best_move = node.get_game_state().get_player(maximized_player); // The root is a
+																							// MAX node
 					}
-			}
+				} else
+					if (node_utility < parent_utility)
+						parent.set_utility(node_utility);
 		}
 
 		list.clear(); // Clear the list for future simulations
