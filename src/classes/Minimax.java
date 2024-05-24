@@ -7,18 +7,18 @@ import src.classes.Game.Difficulty;
 import src.classes.GameState.Player;
 import src.classes.Node.Type;
 
-
 public class Minimax {
-	private List <Node> list = new ArrayList <>();
+	private List<Node> list = new ArrayList<>();
 	private Game game;
 	private int max_depth;
 	private Node root;
 	private Player maximized_player;
-
+	private Heuristic heuristic;
 
 	public Minimax(Game game, Player maximizing_player) {
 		this.game = game;
 		this.maximized_player = maximizing_player;
+		this.heuristic = new Heuristic(maximizing_player, game);
 
 		Difficulty difficulty = game.get_difficulty();
 
@@ -56,7 +56,7 @@ public class Minimax {
 				float heuristic = apply_heuristic(game_state);
 				node.set_utility(heuristic);
 			} else {
-				List <Coordinate> available_tiles = game.get_available_tiles(player, game_state);
+				List<Coordinate> available_tiles = game.get_available_tiles(player, game_state);
 
 				if (available_tiles.size() != 0)
 					for (Coordinate tile : available_tiles) {
@@ -65,7 +65,7 @@ public class Minimax {
 					}
 				else
 					list.add(new Node(game_state, node, node.get_depth() + 1, type)); // In this case it is not necessary
-																					//  make a copy of the game state
+				// make a copy of the game state
 			}
 		}
 	}
@@ -77,7 +77,16 @@ public class Minimax {
 	 * @return the heuristic value for the given game state.
 	 */
 	private float apply_heuristic(GameState game_state) {
-		return 1;
+		// float painted_tiles_score = heuristic.calculate_painted_tiles_score(game_state);
+
+		float future_moves_score = heuristic.calculate_future_moves_score(game_state);
+
+		// float position_section_score = heuristic.calculate_position_section_score(game_state);
+
+		float future_moves_score_from_each_available_tile_score = heuristic
+				.calculate_future_moves_score_from_each_available_tile(game_state);
+
+		return future_moves_score  + future_moves_score_from_each_available_tile_score;
 	}
 
 	/**
@@ -112,11 +121,10 @@ public class Minimax {
 
 					if (parent == root)
 						best_move = node.get_game_state().get_player(maximized_player); // The root is a
-																						// MAX node
+					// MAX node
 				}
-			} else
-				if (node_utility < parent_utility)
-					parent.set_utility(node_utility);
+			} else if (node_utility < parent_utility)
+				parent.set_utility(node_utility);
 		}
 
 		list.clear(); // Clear the list for future simulations

@@ -6,20 +6,17 @@ import java.util.Random;
 
 import src.classes.GameState.Player;
 
-
 public class Game {
 	private Difficulty difficulty;
 	private int columns;
 	private int rows;
 	private Player winner = null;
 
-
 	public Game(Difficulty difficulty, int rows, int columns) {
 		this.difficulty = difficulty;
 		this.rows = rows;
 		this.columns = columns;
 	}
-
 
 	/**
 	 * Builds the initial game state.
@@ -41,9 +38,9 @@ public class Game {
 		while (green_yoshi.equals(red_yoshi))
 			red_yoshi = new Coordinate(random.nextInt(columns), random.nextInt(rows));
 
-		List <Coordinate> free_tiles = new ArrayList <>();
-		List <Coordinate> green_yoshi_tiles = new ArrayList <>();
-		List <Coordinate> red_yoshi_tiles = new ArrayList <>();
+		List<Coordinate> free_tiles = new ArrayList<>();
+		List<Coordinate> green_yoshi_tiles = new ArrayList<>();
+		List<Coordinate> red_yoshi_tiles = new ArrayList<>();
 
 		green_yoshi_tiles.add(green_yoshi);
 		red_yoshi_tiles.add(red_yoshi);
@@ -120,12 +117,12 @@ public class Game {
 	/**
 	 * Returns the list of available tiles for the given player in a game state.
 	 *
-	 * @param player The player for whom to find available tiles.
+	 * @param player     The player for whom to find available tiles.
 	 * @param game_state A game state.
 	 * @return a list of available tiles for the given player.
 	 */
-	public List <Coordinate> get_available_tiles(Player player, GameState game_state) {
-		List <Coordinate> coordinates = new ArrayList <>();
+	public List<Coordinate> get_available_tiles(Player player, GameState game_state) {
+		List<Coordinate> coordinates = new ArrayList<>();
 		Coordinate coordinate = null;
 
 		if (player == Player.GREEN)
@@ -146,14 +143,14 @@ public class Game {
 		 * (x - 2,y + 1) -> |((x - 2) - x)| + |(y + 1) - y)| = 3
 		 * (x - 2,y - 1) -> |((x - 2) - x)| + |(y - 1) - y)| = 3
 		 */
-		List <Coordinate> free_tiles = game_state.get_tiles(null);
+		List<Coordinate> free_tiles = game_state.get_tiles(null);
 		for (int i = x - 2; i <= x + 2; i++) {
 			for (int j = y - 2; j <= y + 2; j++) {
 				if (Math.abs(i - x) + Math.abs(j - y) == 3) {
 					Coordinate possible_tile = new Coordinate(i, j);
 
 					if (is_valid_cordinate_to_move_in(possible_tile, game_state) &&
-						free_tiles.indexOf(possible_tile) != -1)
+							free_tiles.indexOf(possible_tile) != -1)
 						coordinates.add(possible_tile);
 				}
 			}
@@ -190,7 +187,7 @@ public class Game {
 	 */
 	public boolean is_game_finished(GameState game_state) {
 		if (get_available_tiles(Player.GREEN, game_state).size() == 0 &&
-			get_available_tiles(Player.RED, game_state).size() == 0) {
+				get_available_tiles(Player.RED, game_state).size() == 0) {
 
 			int green_yoshi_tiles = game_state.get_tiles(Player.GREEN).size();
 			int red_yoshi_tiles = game_state.get_tiles(Player.RED).size();
@@ -205,6 +202,44 @@ public class Game {
 			return false;
 	}
 
+	/**
+	 * Returns a list of available tiles from a given coordinate in the game state.
+	 *
+	 * @param coordinate The coordinate from which to find available tiles.
+	 * @param game_state The current game state.
+	 * @return A list of coordinates representing the available tiles.
+	 */
+	public List<Coordinate> get_available_tiles_from_coordinate(Coordinate coordinate, GameState game_state) {
+		List<Coordinate> coordinates = new ArrayList<>();
+
+		int x = coordinate.get_x();
+		int y = coordinate.get_y();
+
+		/*
+		 * (x - 1,y - 2) -> |((x - 1) - x)| + |(y - 2) - y)| = 3
+		 * (x + 1,y - 2) -> |((x + 1) - x)| + |(y - 2) - y)| = 3
+		 * (x + 2,y - 1) -> |((x + 2) - x)| + |(y - 1) - y)| = 3
+		 * (x + 2,y + 1) -> |((x + 2) - x)| + |(y + 1) - y)| = 3
+		 * (x + 1,y + 2) -> |((x + 1) - x)| + |(y + 2) - y)| = 3
+		 * (x - 1,y + 2) -> |((x - 1) - x)| + |(y + 2) - y)| = 3
+		 * (x - 2,y + 1) -> |((x - 2) - x)| + |(y + 1) - y)| = 3
+		 * (x - 2,y - 1) -> |((x - 2) - x)| + |(y - 1) - y)| = 3
+		 */
+		List<Coordinate> free_tiles = game_state.get_tiles(null);
+		for (int i = x - 2; i <= x + 2; i++) {
+			for (int j = y - 2; j <= y + 2; j++) {
+				if (Math.abs(i - x) + Math.abs(j - y) == 3) {
+					Coordinate possible_tile = new Coordinate(i, j);
+
+					if (is_valid_cordinate_to_move_in(possible_tile, game_state) &&
+							free_tiles.indexOf(possible_tile) != -1)
+						coordinates.add(possible_tile);
+				}
+			}
+		}
+
+		return coordinates;
+	}
 
 	/**
 	 * Represents the difficulty levels of the game.
