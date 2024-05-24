@@ -1,13 +1,18 @@
-package src.classes;
+package src.classes.heuristic;
 
+import src.classes.Coordinate;
+import src.classes.Game;
+import src.classes.GameState;
 import src.classes.GameState.Player;
 
 import java.util.List;
 
-public class Heuristic2 extends Heuristic {
-	public Heuristic2(Player maximized_player, Game game) {
+
+public class Heuristic1 extends Heuristic {
+	public Heuristic1(Player maximized_player, Game game) {
 		super(game, maximized_player);
 	}
+
 
 	/**
 	 * Counts the number of tiles painted by the specified player in the game state.
@@ -17,7 +22,7 @@ public class Heuristic2 extends Heuristic {
 	 * @return the number of tiles painted by the player
 	 */
 	private int count_player_painted_tiles(GameState game_state, Player player) {
-		List<Coordinate> tiles = game_state.get_tiles(player);
+		List <Coordinate> tiles = game_state.get_tiles(player);
 		return tiles.size();
 	}
 
@@ -53,8 +58,8 @@ public class Heuristic2 extends Heuristic {
 	 */
 	private int calculate_future_moves_score(GameState game_state) {
 		Player opponent = maximized_player == Player.GREEN ? Player.RED : Player.GREEN;
-		List<Coordinate> availableMoves = game.get_available_tiles(maximized_player, game_state);
-		List<Coordinate> opponentAvailableMoves = game.get_available_tiles(opponent, game_state);
+		List <Coordinate> availableMoves = game.get_available_tiles(game_state.get_player(maximized_player), game_state);
+		List <Coordinate> opponentAvailableMoves = game.get_available_tiles(game_state.get_player(opponent), game_state);
 		return availableMoves.size() - opponentAvailableMoves.size();
 	}
 
@@ -102,11 +107,11 @@ public class Heuristic2 extends Heuristic {
 	 * @return the total score based on the number of future moves from each available tile
 	 */
 	private int calculate_future_moves_score_from_each_available_tile(GameState game_state) {
-		List<Coordinate> availableMoves = game.get_available_tiles(maximized_player, game_state);
+		List <Coordinate> availableMoves = game.get_available_tiles(game_state.get_player(maximized_player), game_state);
 		int totalFutureMoves = 0;
 
 		for (Coordinate move : availableMoves) {
-			List<Coordinate> futureMoves = game.get_available_tiles_from_coordinate(move, game_state);
+			List <Coordinate> futureMoves = game.get_available_tiles(move, game_state);
 			totalFutureMoves += futureMoves.size();
 		}
 
@@ -117,14 +122,14 @@ public class Heuristic2 extends Heuristic {
 		// float painted_tiles_score =
 		// heuristic.calculate_painted_tiles_score(game_state);
 
-		float future_moves_score = calculate_future_moves_score(game_state);
+		// float future_moves_score = calculate_future_moves_score(game_state);
 
 		// float position_section_score =
 		// heuristic.calculate_position_section_score(game_state);
 
-		float future_moves_score_from_each_available_tile_score = calculate_future_moves_score_from_each_available_tile(
-				game_state);
+		// float future_moves_score_from_each_available_tile_score = calculate_future_moves_score_from_each_available_tile(
+		// 		game_state);
 
-		return future_moves_score + future_moves_score_from_each_available_tile_score;
+		return count_player_painted_tiles(game_state, maximized_player) - count_player_painted_tiles(game_state, minimized_player);
 	}
 }

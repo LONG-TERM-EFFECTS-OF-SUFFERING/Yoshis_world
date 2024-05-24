@@ -28,8 +28,8 @@ import src.classes.ImageCollection;
 import src.classes.Minimax;
 import src.classes.Game.Difficulty;
 import src.classes.GameState.Player;
+import src.classes.heuristic.Heuristic1;
 import src.classes.GameState;
-import src.classes.Heuristic1;
 
 
 public class GameWindow extends JFrame implements ActionListener {
@@ -65,7 +65,7 @@ public class GameWindow extends JFrame implements ActionListener {
 		game_state = game.build_initial_game_state();
 		game_state = game.play(machine, minimax.run(game_state), game_state); // The first move is made by the
 																				// machine
-		available_human_tiles = game.get_available_tiles(human, game_state);
+		available_human_tiles = game.get_available_tiles(game_state.get_player(human), game_state);
 
 		Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 		int screen_width = (int) screen_size.getWidth();
@@ -187,7 +187,7 @@ public class GameWindow extends JFrame implements ActionListener {
 
 		Coordinate machine_tile = minimax.run(game_state);
 
-		available_human_tiles = game.get_available_tiles(human, game_state); // Update after the
+		available_human_tiles = game.get_available_tiles(game_state.get_player(human), game_state); // Update after the
 																				// player move
 
 		if (available_human_tiles.size() == 0)
@@ -198,7 +198,7 @@ public class GameWindow extends JFrame implements ActionListener {
 		else if (machine_tile != null)
 			game_state = game.play(machine, machine_tile, game_state);
 
-		available_human_tiles = game.get_available_tiles(human, game_state); // Update after the
+		available_human_tiles = game.get_available_tiles(game_state.get_player(human), game_state); // Update after the
 																				// machine move
 
 		update_grid();
@@ -238,7 +238,7 @@ public class GameWindow extends JFrame implements ActionListener {
 		JLabel machine_tiles_label = new JLabel("Machine tiles: " + game_state.get_tiles(machine).size());
 		machine_tiles_label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		Player winner = game.get_winner();
+		Player winner = game.get_winner(game_state);
 		String string_winner;
 
 		if (winner == human)
@@ -301,7 +301,7 @@ public class GameWindow extends JFrame implements ActionListener {
 			for (Coordinate coordinate : available_human_tiles)
 				System.out.println(coordinate);
 
-			List <Coordinate> available_machine_tiles = game.get_available_tiles(machine, game_state);
+			List <Coordinate> available_machine_tiles = game.get_available_tiles(game_state.get_player(machine), game_state);
 			System.out.println("Available machine tiles");
 			for (Coordinate coordinate : available_machine_tiles)
 				System.out.println(coordinate);

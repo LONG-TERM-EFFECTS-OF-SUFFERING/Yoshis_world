@@ -1,29 +1,27 @@
 package src.classes;
 
 import src.classes.GameState.Player;
+import src.classes.heuristic.Heuristic;
+import src.classes.heuristic.Heuristic1;
+import src.classes.heuristic.Heuristic2;
 
 
 public class Simulation {
-	private Coordinate green_yoshi_coordinate;
-	private Coordinate red_yoshi_coordinate;
 	private Game game;
-	private GameState game_state;
 	private Minimax green_yoshi_minimax;
 	private Minimax red_yoshi_minimax;
 
 
-	public Simulation(Coordinate green_yoshi_coordinate, Coordinate red_yoshi_coordinate,
-						Game game) {
-		this.green_yoshi_coordinate = green_yoshi_coordinate;
-		this.red_yoshi_coordinate = red_yoshi_coordinate;
+	public Simulation(Game game) {
 		this.game = game;
 
-		Heuristic heuristic = new Heuristic1(Player.GREEN, game);
-		green_yoshi_minimax = new Minimax(heuristic, game, Player.GREEN);
+		Heuristic heuristic_1 = new Heuristic1(Player.GREEN, game);
+		green_yoshi_minimax = new Minimax(heuristic_1, game, Player.GREEN);
 
-		heuristic = new Heuristic2(Player.RED, game);
-		red_yoshi_minimax = new Minimax(heuristic, game, Player.RED);
+		Heuristic heuristic_2 = new Heuristic2(Player.RED, game);
+		red_yoshi_minimax = new Minimax(heuristic_2, game, Player.RED);
 	}
+
 
 	/**
 	 * Runs a single game simulation.
@@ -46,7 +44,12 @@ public class Simulation {
 				game_state_copy = game.play(Player.GREEN, tile, game_state_copy);
 		}
 
-		return game.get_winner();
+		System.out.println("Red " + game_state_copy.get_tiles(Player.RED).size());
+		System.out.println("Green " + game_state_copy.get_tiles(Player.RED).size());
+		System.out.println("Free " + game_state_copy.get_tiles(null).size());
+		System.out.println("");
+
+		return game.get_winner(game_state_copy);
 	}
 
 	/**
@@ -62,12 +65,16 @@ public class Simulation {
 		for (int i = 0; i < iterations; i++) {
 			Player winner = run_game();
 
-			if (winner == Player.GREEN)
+			if (winner == Player.GREEN) {
+				System.out.println("Green Yoshi");
 				green_yoshi_wins++;
-			else if (winner == Player.RED)
+			} else if (winner == Player.RED) {
+				System.out.println("Red Yoshi");
 				red_yoshi_wins++;
-			else
+			} else {
+				System.out.println("Tie");
 				ties++;
+			}
 		}
 
 		System.out.println("Simulation results");

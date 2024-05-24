@@ -6,6 +6,8 @@ import java.util.List;
 import src.classes.Game.Difficulty;
 import src.classes.GameState.Player;
 import src.classes.Node.Type;
+import src.classes.heuristic.Heuristic;
+
 
 public class Minimax {
 	private List <Node> list = new ArrayList <>();
@@ -14,6 +16,7 @@ public class Minimax {
 	private int max_depth;
 	private Node root;
 	private Player maximized_player;
+
 
 	public Minimax(Heuristic heuristic, Game game, Player maximizing_player) {
 		this.game = game;
@@ -29,6 +32,7 @@ public class Minimax {
 		else
 			max_depth = 6;
 	}
+
 
 	/**
 	 * Expands a given node in the search tree.
@@ -56,7 +60,7 @@ public class Minimax {
 				float heuristic = apply_heuristic(game_state);
 				node.set_utility(heuristic);
 			} else {
-				List<Coordinate> available_tiles = game.get_available_tiles(player, game_state);
+				List <Coordinate> available_tiles = game.get_available_tiles(game_state.get_player(player), game_state);
 
 				if (available_tiles.size() != 0)
 					for (Coordinate tile : available_tiles) {
@@ -65,7 +69,7 @@ public class Minimax {
 					}
 				else
 					list.add(new Node(game_state, node, node.get_depth() + 1, type)); // In this case it is not necessary
-				// make a copy of the game state
+																					// make a copy of the game state
 			}
 		}
 	}
