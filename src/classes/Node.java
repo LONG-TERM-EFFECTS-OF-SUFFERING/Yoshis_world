@@ -1,5 +1,6 @@
 package src.classes;
 
+import src.classes.GameState.Player;
 
 public class Node {
 	private GameState game_state;
@@ -74,6 +75,23 @@ public class Node {
 	 */
 	public void set_utility(float utility) {
 		this.utility = utility;
+	}
+
+	/**
+	 * Returns a string representation of the Node object.
+	 * The string includes the values of the human player, machine player, depth, utility, and type.
+	 *
+	 * @return a string representation of the Node object.
+	 */
+	@Override
+	public String toString() {
+		return "Node{" +
+				"\n\thuman = " + game_state.get_player(Player.RED) +
+				"\n\tmachine = " + game_state.get_player(Player.GREEN) +
+				"\n\tdepth = " + depth +
+				"\n\tutility = " + utility +
+				"\n\ttype = " + type +
+				"\n}";
 	}
 
 

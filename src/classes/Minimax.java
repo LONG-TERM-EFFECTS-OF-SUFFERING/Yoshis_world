@@ -57,10 +57,15 @@ public class Minimax {
 				node.set_utility(heuristic);
 			} else {
 				List <Coordinate> available_tiles = game.get_available_tiles(player, game_state);
-				for (Coordinate tile : available_tiles) {
-					GameState new_game_state = game.play(player, tile,node.get_game_state().copy());
-					list.add(new Node(new_game_state, node, node.get_depth() + 1 , type));
-				}
+
+				if (available_tiles.size() != 0)
+					for (Coordinate tile : available_tiles) {
+						GameState new_game_state = game.play(player, tile, node.get_game_state().copy());
+						list.add(new Node(new_game_state, node, node.get_depth() + 1, type));
+					}
+				else
+					list.add(new Node(game_state, node, node.get_depth() + 1, type)); // In this case it is not necessary
+																					//  make a copy of the game state
 			}
 		}
 	}
@@ -93,25 +98,25 @@ public class Minimax {
 
 		Coordinate best_move = null;
 
-		for (int i = 1; i < list.size() - 1; i++) {
+		for (int i = 0; i < list.size() - 1; i++) {
 			Node node = list.get(i);
 			float node_utility = node.get_utility();
 
 			Node parent = node.get_parent();
 
-				float parent_utility = parent.get_utility();
+			float parent_utility = parent.get_utility();
 
-				if (parent.get_type() == Type.MAX) {
-					if (node_utility > parent_utility) {
-						parent.set_utility(node_utility);
+			if (parent.get_type() == Type.MAX) {
+				if (node_utility > parent_utility) {
+					parent.set_utility(node_utility);
 
-						if (parent == root)
-							best_move = node.get_game_state().get_player(maximized_player); // The root is a
-																							// MAX node
-					}
-				} else
-					if (node_utility < parent_utility)
-						parent.set_utility(node_utility);
+					if (parent == root)
+						best_move = node.get_game_state().get_player(maximized_player); // The root is a
+																						// MAX node
+				}
+			} else
+				if (node_utility < parent_utility)
+					parent.set_utility(node_utility);
 		}
 
 		list.clear(); // Clear the list for future simulations
