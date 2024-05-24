@@ -90,7 +90,9 @@ public class Game {
 	 * @return the winner of the game.
 	 */
 	public Player get_winner() {
-		return winner;
+		Player winner_copy = winner;
+		winner = null;
+		return winner_copy;
 	}
 
 	/**

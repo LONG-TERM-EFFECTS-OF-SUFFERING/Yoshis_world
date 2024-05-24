@@ -8,17 +8,17 @@ import src.classes.GameState.Player;
 import src.classes.Node.Type;
 
 public class Minimax {
-	private List<Node> list = new ArrayList<>();
+	private List <Node> list = new ArrayList <>();
+	private Heuristic heuristic;
 	private Game game;
 	private int max_depth;
 	private Node root;
 	private Player maximized_player;
-	private Heuristic heuristic;
 
-	public Minimax(Game game, Player maximizing_player) {
+	public Minimax(Heuristic heuristic, Game game, Player maximizing_player) {
 		this.game = game;
 		this.maximized_player = maximizing_player;
-		this.heuristic = new Heuristic(maximizing_player, game);
+		this.heuristic = heuristic;
 
 		Difficulty difficulty = game.get_difficulty();
 
@@ -77,16 +77,7 @@ public class Minimax {
 	 * @return the heuristic value for the given game state.
 	 */
 	private float apply_heuristic(GameState game_state) {
-		// float painted_tiles_score = heuristic.calculate_painted_tiles_score(game_state);
-
-		float future_moves_score = heuristic.calculate_future_moves_score(game_state);
-
-		// float position_section_score = heuristic.calculate_position_section_score(game_state);
-
-		float future_moves_score_from_each_available_tile_score = heuristic
-				.calculate_future_moves_score_from_each_available_tile(game_state);
-
-		return future_moves_score  + future_moves_score_from_each_available_tile_score;
+		return heuristic.get_score(game_state);
 	}
 
 	/**

@@ -29,6 +29,7 @@ import src.classes.Minimax;
 import src.classes.Game.Difficulty;
 import src.classes.GameState.Player;
 import src.classes.GameState;
+import src.classes.Heuristic1;
 
 
 public class GameWindow extends JFrame implements ActionListener {
@@ -60,7 +61,7 @@ public class GameWindow extends JFrame implements ActionListener {
 		machine = human == Player.GREEN ? Player.RED : Player.GREEN;
 
 		game = new Game(difficulty, rows, columns);
-		minimax = new Minimax(game, machine);
+		minimax = new Minimax(new Heuristic1(machine, game), game, machine);
 		game_state = game.build_initial_game_state();
 		game_state = game.play(machine, minimax.run(game_state), game_state); // The first move is made by the
 																				// machine
