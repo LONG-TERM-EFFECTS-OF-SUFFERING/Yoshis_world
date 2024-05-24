@@ -116,7 +116,7 @@ public class Minimax {
 
 					if (parent == root)
 						best_move = node.get_game_state().get_player(maximized_player); // The root is a
-					// MAX node
+																						// MAX node
 				}
 			} else if (node_utility < parent_utility)
 				parent.set_utility(node_utility);

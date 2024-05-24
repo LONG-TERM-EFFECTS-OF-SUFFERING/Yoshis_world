@@ -16,7 +16,7 @@ public class Main {
 		// MenuWindow menu_window = new MenuWindow();
 		// menu_window.setVisible(true);
 
-		Game game = new Game(Difficulty.NORMAL, 6, 5);
+		Game game = new Game(Difficulty.HARD, 8, 8);
 
 		Simulation simulation = new Simulation(game);
 		simulation.run(100);

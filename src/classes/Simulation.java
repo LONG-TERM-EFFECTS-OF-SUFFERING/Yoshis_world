@@ -44,11 +44,6 @@ public class Simulation {
 				game_state_copy = game.play(Player.GREEN, tile, game_state_copy);
 		}
 
-		System.out.println("Red " + game_state_copy.get_tiles(Player.RED).size());
-		System.out.println("Green " + game_state_copy.get_tiles(Player.RED).size());
-		System.out.println("Free " + game_state_copy.get_tiles(null).size());
-		System.out.println("");
-
 		return game.get_winner(game_state_copy);
 	}
 
@@ -65,16 +60,12 @@ public class Simulation {
 		for (int i = 0; i < iterations; i++) {
 			Player winner = run_game();
 
-			if (winner == Player.GREEN) {
-				System.out.println("Green Yoshi");
+			if (winner == Player.GREEN)
 				green_yoshi_wins++;
-			} else if (winner == Player.RED) {
-				System.out.println("Red Yoshi");
+			else if (winner == Player.RED)
 				red_yoshi_wins++;
-			} else {
-				System.out.println("Tie");
+			else
 				ties++;
-			}
 		}
 
 		System.out.println("Simulation results");
