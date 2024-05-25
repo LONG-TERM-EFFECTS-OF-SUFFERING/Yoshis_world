@@ -13,12 +13,12 @@ public class Main {
 	 * @param args The command-line arguments.
 	 */
 	public static void main(String[] args) {
-		// MenuWindow menu_window = new MenuWindow();
-		// menu_window.setVisible(true);
+		MenuWindow menu_window = new MenuWindow();
+		menu_window.setVisible(true);
 
-		Game game = new Game(Difficulty.HARD, 8, 8);
+		// Game game = new Game(Difficulty.MEDIUM, 8, 8);
 
-		Simulation simulation = new Simulation(game);
-		simulation.run(100);
+		// Simulation simulation = new Simulation(game);
+		// simulation.run(100);
 	}
 }

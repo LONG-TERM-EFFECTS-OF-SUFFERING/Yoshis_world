@@ -15,11 +15,11 @@ public class Simulation {
 	public Simulation(Game game) {
 		this.game = game;
 
-		Heuristic heuristic_1 = new Heuristic1(Player.GREEN, game);
-		green_yoshi_minimax = new Minimax(heuristic_1, game, Player.GREEN);
+		Heuristic heuristic = new Heuristic1(Player.GREEN, game);
+		green_yoshi_minimax = new Minimax(heuristic, game, Player.GREEN);
 
-		Heuristic heuristic_2 = new Heuristic2(Player.RED, game);
-		red_yoshi_minimax = new Minimax(heuristic_2, game, Player.RED);
+		heuristic = new Heuristic2(Player.RED, game);
+		red_yoshi_minimax = new Minimax(heuristic, game, Player.RED);
 	}
 
 

@@ -31,7 +31,6 @@ import src.classes.GameState.Player;
 import src.classes.heuristic.Heuristic1;
 import src.classes.GameState;
 
-
 public class GameWindow extends JFrame implements ActionListener {
 	private Difficulty difficulty;
 	private Game game;
@@ -47,11 +46,10 @@ public class GameWindow extends JFrame implements ActionListener {
 	private JLabel machine_tiles_counter;
 	private JLabel player_tiles_counter;
 	private JPanel grid_panel;
-	private List <Coordinate> available_human_tiles;
+	private List<Coordinate> available_human_tiles;
 	private Minimax minimax;
 	private Player human;
 	private Player machine;
-
 
 	public GameWindow(Difficulty difficulty, int rows, int columns, Player human) {
 		this.difficulty = difficulty;
@@ -64,7 +62,7 @@ public class GameWindow extends JFrame implements ActionListener {
 		minimax = new Minimax(new Heuristic1(machine, game), game, machine);
 		game_state = game.build_initial_game_state();
 		game_state = game.play(machine, minimax.run(game_state), game_state); // The first move is made by the
-																				// machine
+		// machine
 		available_human_tiles = game.get_available_tiles(game_state.get_player(human), game_state);
 
 		Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
@@ -140,9 +138,9 @@ public class GameWindow extends JFrame implements ActionListener {
 		Coordinate human_coordinate = game_state.get_player(human);
 		Coordinate machine_coordinate = game_state.get_player(machine);
 
-		List <Coordinate> player_tiles = game_state.get_tiles(human);
-		List <Coordinate> machine_tiles = game_state.get_tiles(machine);
-		List <Coordinate> free_tiles = game_state.get_tiles(null);
+		List<Coordinate> player_tiles = game_state.get_tiles(human);
+		List<Coordinate> machine_tiles = game_state.get_tiles(machine);
+		List<Coordinate> free_tiles = game_state.get_tiles(null);
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
@@ -188,7 +186,7 @@ public class GameWindow extends JFrame implements ActionListener {
 		Coordinate machine_tile = minimax.run(game_state);
 
 		available_human_tiles = game.get_available_tiles(game_state.get_player(human), game_state); // Update after the
-																				// player move
+		// player move
 
 		if (available_human_tiles.size() == 0)
 			while (machine_tile != null) {
@@ -199,7 +197,7 @@ public class GameWindow extends JFrame implements ActionListener {
 			game_state = game.play(machine, machine_tile, game_state);
 
 		available_human_tiles = game.get_available_tiles(game_state.get_player(human), game_state); // Update after the
-																				// machine move
+		// machine move
 
 		update_grid();
 
@@ -301,7 +299,7 @@ public class GameWindow extends JFrame implements ActionListener {
 			for (Coordinate coordinate : available_human_tiles)
 				System.out.println(coordinate);
 
-			List <Coordinate> available_machine_tiles = game.get_available_tiles(game_state.get_player(machine), game_state);
+			List<Coordinate> available_machine_tiles = game.get_available_tiles(game_state.get_player(machine), game_state);
 			System.out.println("Available machine tiles");
 			for (Coordinate coordinate : available_machine_tiles)
 				System.out.println(coordinate);

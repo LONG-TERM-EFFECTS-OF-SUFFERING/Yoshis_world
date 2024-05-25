@@ -7,12 +7,10 @@ import src.classes.GameState.Player;
 
 import java.util.List;
 
-
 public class Heuristic1 extends Heuristic {
 	public Heuristic1(Player maximized_player, Game game) {
 		super(game, maximized_player);
 	}
-
 
 	/**
 	 * Counts the number of tiles painted by the specified player in the game state.
@@ -22,7 +20,7 @@ public class Heuristic1 extends Heuristic {
 	 * @return the number of tiles painted by the player
 	 */
 	private int count_player_painted_tiles(GameState game_state, Player player) {
-		List <Coordinate> tiles = game_state.get_tiles(player);
+		List<Coordinate> tiles = game_state.get_tiles(player);
 		return tiles.size();
 	}
 
@@ -58,13 +56,14 @@ public class Heuristic1 extends Heuristic {
 	 */
 	private int calculate_future_moves_score(GameState game_state) {
 		Player opponent = maximized_player == Player.GREEN ? Player.RED : Player.GREEN;
-		List <Coordinate> availableMoves = game.get_available_tiles(game_state.get_player(maximized_player), game_state);
-		List <Coordinate> opponentAvailableMoves = game.get_available_tiles(game_state.get_player(opponent), game_state);
+		List<Coordinate> availableMoves = game.get_available_tiles(game_state.get_player(maximized_player), game_state);
+		List<Coordinate> opponentAvailableMoves = game.get_available_tiles(game_state.get_player(opponent), game_state);
 		return availableMoves.size() - opponentAvailableMoves.size();
 	}
 
 	/**
-	 * Calculates the score based on the section of the player's position on the game board.
+	 * Calculates the score based on the section of the player's position on the
+	 * game board.
 	 * The score is determined as follows:
 	 * - If the player is in a corner, the score is -15.
 	 * - If the player is on a border, the score is -10.
@@ -87,31 +86,33 @@ public class Heuristic1 extends Heuristic {
 		// Determine the section of the player's position
 		if ((x == 0 && y == 0) || (x == 0 && y == 7) || (x == 7 && y == 0) || (x == 7 && y == 7)) {
 			// The player is in a corner
-			return -15;
+			return 1;
 		} else if ((x == 0 || x == 7) && (1 <= y && y <= 6) || (y == 0 || y == 7) && (1 <= x && x <= 6)) {
 			// The player is on a border
-			return -10;
+			return 2;
 		} else if ((x == 1 || x == 6) && (1 <= y && y <= 6) || (y == 1 || y == 6) && (1 <= x && x <= 6)) {
 			// The player is in the interior near the border
-			return -5;
+			return 4;
 		} else {
 			// The player is in the center
-			return 0;
+			return 6;
 		}
 	}
 
 	/**
-	 * Calculates the score based on the number of future moves from each available tile in the game state.
+	 * Calculates the score based on the number of future moves from each available
+	 * tile in the game state.
 	 *
 	 * @param game_state the current game state
-	 * @return the total score based on the number of future moves from each available tile
+	 * @return the total score based on the number of future moves from each
+	 *         available tile
 	 */
 	private int calculate_future_moves_score_from_each_available_tile(GameState game_state) {
-		List <Coordinate> availableMoves = game.get_available_tiles(game_state.get_player(maximized_player), game_state);
+		List<Coordinate> availableMoves = game.get_available_tiles(game_state.get_player(maximized_player), game_state);
 		int totalFutureMoves = 0;
 
 		for (Coordinate move : availableMoves) {
-			List <Coordinate> futureMoves = game.get_available_tiles(move, game_state);
+			List<Coordinate> futureMoves = game.get_available_tiles(move, game_state);
 			totalFutureMoves += futureMoves.size();
 		}
 
@@ -119,17 +120,6 @@ public class Heuristic1 extends Heuristic {
 	}
 
 	public float get_score(GameState game_state) {
-		// float painted_tiles_score =
-		// heuristic.calculate_painted_tiles_score(game_state);
-
-		// float future_moves_score = calculate_future_moves_score(game_state);
-
-		// float position_section_score =
-		// heuristic.calculate_position_section_score(game_state);
-
-		// float future_moves_score_from_each_available_tile_score = calculate_future_moves_score_from_each_available_tile(
-		// 		game_state);
-
-		return count_player_painted_tiles(game_state, maximized_player) - count_player_painted_tiles(game_state, minimized_player);
+		return calculate_future_moves_score(game_state) + calculate_future_moves_score_from_each_available_tile(game_state);
 	}
 }
