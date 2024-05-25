@@ -6,12 +6,10 @@ import java.util.Random;
 
 import src.classes.GameState.Player;
 
-
 public class Game {
 	private Difficulty difficulty;
 	private int columns;
 	private int rows;
-	private Player winner = null;
 
 
 	public Game(Difficulty difficulty, int rows, int columns) {
@@ -88,11 +86,22 @@ public class Game {
 	}
 
 	/**
-	 * Returns the winner of the game.
+	 * Determines the winner in a game state.
+	 * The player who occupies more tiles is declared the winner.
 	 *
-	 * @return the winner of the game.
+	 * @param game_state A game state.
+	 * @return The player who has occupied more tiles, or null if there is a tie.
 	 */
-	public Player get_winner() {
+	public Player get_winner(GameState game_state) {
+		Player winner = null;
+		int green_yoshi_tiles = game_state.get_tiles(Player.GREEN).size();
+		int red_yoshi_tiles = game_state.get_tiles(Player.RED).size();
+
+		if (green_yoshi_tiles > red_yoshi_tiles)
+			winner = Player.GREEN;
+		else if (red_yoshi_tiles > green_yoshi_tiles)
+			winner = Player.RED;
+
 		return winner;
 	}
 
@@ -117,21 +126,33 @@ public class Game {
 				game_state.get_tiles(Player.RED).indexOf(coordinate) == -1;
 	}
 
-	/**
-	 * Returns the list of available tiles for the given player in a game state.
-	 *
-	 * @param player The player for whom to find available tiles.
-	 * @param game_state A game state.
-	 * @return a list of available tiles for the given player.
-	 */
-	public List <Coordinate> get_available_tiles(Player player, GameState game_state) {
-		List <Coordinate> coordinates = new ArrayList <>();
-		Coordinate coordinate = null;
 
-		if (player == Player.GREEN)
-			coordinate = game_state.get_player(Player.GREEN);
-		else
-			coordinate = game_state.get_player(Player.RED);
+	/**
+	 * Plays a game by moving the given player to the specified tile in a copy
+	 * of the given game state.
+	 *
+	 * @param player     the player object representing the player in the game
+	 * @param tile       the coordinate of the tile to move the player to.
+	 * @param game_state A game state.
+	 * @return the game state in which the move was made.
+	 */
+	public GameState play(Player player, Coordinate tile, GameState game_state) {
+		GameState game_state_copy = game_state.copy();
+
+		game_state_copy.move_to_tile(player, tile);
+
+		return game_state_copy;
+	}
+
+	/**
+	 * Returns a list of available tiles from a given coordinate in the game state.
+	 *
+	 * @param coordinate The coordinate from which to find available tiles.
+	 * @param game_state The current game state.
+	 * @return A list of coordinates representing the available tiles.
+	 */
+	public List <Coordinate> get_available_tiles(Coordinate coordinate, GameState game_state) {
+		List <Coordinate> coordinates = new ArrayList<>();
 
 		int x = coordinate.get_x();
 		int y = coordinate.get_y();
@@ -153,7 +174,7 @@ public class Game {
 					Coordinate possible_tile = new Coordinate(i, j);
 
 					if (is_valid_cordinate_to_move_in(possible_tile, game_state) &&
-						free_tiles.indexOf(possible_tile) != -1)
+							free_tiles.indexOf(possible_tile) != -1)
 						coordinates.add(possible_tile);
 				}
 			}
@@ -163,47 +184,17 @@ public class Game {
 	}
 
 	/**
-	 * Plays a game by moving the given player to the specified tile in a copy
-	 * of the given game state.
-	 *
-	 * @param player     the player object representing the player in the game
-	 * @param tile       the coordinate of the tile to move the player to.
-	 * @param game_state A game state.
-	 * @return the game state in which the move was made.
-	 */
-	public GameState play(Player player, Coordinate tile, GameState game_state) {
-		GameState game_state_copy = game_state.copy();
-
-		game_state_copy.move_to_tile(player, tile);
-
-		return game_state_copy;
-	}
-
-	/**
 	 * Checks if the game is finished in the given game sate by determining if
 	 * both players have no available tiles left.
-	 * If the game is finished, it determines the winner based on the number of
-	 * tiles each player has.
 	 *
 	 * @param game_state A game state.
 	 * @return true if the game is finished, false otherwise.
 	 */
 	public boolean is_game_finished(GameState game_state) {
-		if (get_available_tiles(Player.GREEN, game_state).size() == 0 &&
-			get_available_tiles(Player.RED, game_state).size() == 0) {
-
-			int green_yoshi_tiles = game_state.get_tiles(Player.GREEN).size();
-			int red_yoshi_tiles = game_state.get_tiles(Player.RED).size();
-
-			if (green_yoshi_tiles > red_yoshi_tiles)
-				winner = Player.GREEN;
-			else if (red_yoshi_tiles > green_yoshi_tiles)
-				winner = Player.RED;
-
-			return true;
-		} else
-			return false;
+		return get_available_tiles(game_state.get_player(Player.GREEN), game_state).size() == 0 &&
+				get_available_tiles(game_state.get_player(Player.RED), game_state).size() == 0;
 	}
+
 
 
 	/**

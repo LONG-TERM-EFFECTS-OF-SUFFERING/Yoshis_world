@@ -6,19 +6,22 @@ import java.util.List;
 import src.classes.Game.Difficulty;
 import src.classes.GameState.Player;
 import src.classes.Node.Type;
+import src.classes.heuristic.Heuristic;
 
 
 public class Minimax {
 	private List <Node> list = new ArrayList <>();
+	private Heuristic heuristic;
 	private Game game;
 	private int max_depth;
 	private Node root;
 	private Player maximized_player;
 
 
-	public Minimax(Game game, Player maximizing_player) {
+	public Minimax(Heuristic heuristic, Game game, Player maximizing_player) {
 		this.game = game;
 		this.maximized_player = maximizing_player;
+		this.heuristic = heuristic;
 
 		Difficulty difficulty = game.get_difficulty();
 
@@ -29,6 +32,7 @@ public class Minimax {
 		else
 			max_depth = 6;
 	}
+
 
 	/**
 	 * Expands a given node in the search tree.
@@ -56,7 +60,7 @@ public class Minimax {
 				float heuristic = apply_heuristic(game_state);
 				node.set_utility(heuristic);
 			} else {
-				List <Coordinate> available_tiles = game.get_available_tiles(player, game_state);
+				List <Coordinate> available_tiles = game.get_available_tiles(game_state.get_player(player), game_state);
 
 				if (available_tiles.size() != 0)
 					for (Coordinate tile : available_tiles) {
@@ -65,7 +69,7 @@ public class Minimax {
 					}
 				else
 					list.add(new Node(game_state, node, node.get_depth() + 1, type)); // In this case it is not necessary
-																					//  make a copy of the game state
+																					// make a copy of the game state
 			}
 		}
 	}
@@ -77,7 +81,7 @@ public class Minimax {
 	 * @return the heuristic value for the given game state.
 	 */
 	private float apply_heuristic(GameState game_state) {
-		return 1;
+		return heuristic.get_score(game_state);
 	}
 
 	/**
@@ -114,9 +118,8 @@ public class Minimax {
 						best_move = node.get_game_state().get_player(maximized_player); // The root is a
 																						// MAX node
 				}
-			} else
-				if (node_utility < parent_utility)
-					parent.set_utility(node_utility);
+			} else if (node_utility < parent_utility)
+				parent.set_utility(node_utility);
 		}
 
 		list.clear(); // Clear the list for future simulations

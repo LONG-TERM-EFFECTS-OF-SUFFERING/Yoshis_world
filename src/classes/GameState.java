@@ -74,15 +74,15 @@ public class GameState {
 	 * @param tile the tile to move the player to.
 	 */
 	public void move_to_tile(Player player, Coordinate tile) {
-		if (player == Player.GREEN) {
+		if (player == Player.GREEN && green_yoshi_tiles.indexOf(tile) == -1) {
 			green_yoshi_tiles.add(tile);
 			green_yoshi = tile;
-		} else if (player == Player.RED) {
+			free_tiles.remove(tile);
+		} else if (player == Player.RED && red_yoshi_tiles.indexOf(tile) == -1) {
 			red_yoshi_tiles.add(tile);
 			red_yoshi = tile;
+			free_tiles.remove(tile);
 		}
-
-		free_tiles.remove(tile);
 	}
 
 	/**

@@ -65,7 +65,7 @@ public class MenuWindow extends JFrame implements ActionListener {
 				}
 
 				dispose();
-				GameWindow game_window = new GameWindow(difficulty, 6, 5, Player.RED);
+				GameWindow game_window = new GameWindow(difficulty, 8, 8, Player.RED);
 				game_window.setVisible(true);
 			}
 		}
