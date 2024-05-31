@@ -14,6 +14,7 @@ abstract public class Heuristic {
 	public Heuristic(Game game, Player maximized_player) {
 		this.game = game;
 		this.maximized_player = maximized_player;
+
 		minimized_player = maximized_player == Player.GREEN ? Player.RED : Player.GREEN;
 	}
 

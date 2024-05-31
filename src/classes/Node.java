@@ -95,6 +95,9 @@ public class Node {
 	}
 
 
+	/**
+	 * Represents the type of a node in the Minimax algorithm.
+	 */
 	static public enum Type {
 		MIN,
 		MAX

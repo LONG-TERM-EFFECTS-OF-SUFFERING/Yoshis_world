@@ -68,8 +68,7 @@ public class Minimax {
 						list.add(new Node(new_game_state, node, node.get_depth() + 1, type));
 					}
 				else
-					list.add(new Node(game_state, node, node.get_depth() + 1, type)); // In this case it is not necessary
-																					// make a copy of the game state
+					list.add(new Node(game_state, node, node.get_depth() + 1, type));
 			}
 		}
 	}

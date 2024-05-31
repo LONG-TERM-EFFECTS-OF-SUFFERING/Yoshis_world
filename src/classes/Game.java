@@ -152,7 +152,7 @@ public class Game {
 	 * @return A list of coordinates representing the available tiles.
 	 */
 	public List <Coordinate> get_available_tiles(Coordinate coordinate, GameState game_state) {
-		List <Coordinate> coordinates = new ArrayList<>();
+		List <Coordinate> coordinates = new ArrayList <>();
 
 		int x = coordinate.get_x();
 		int y = coordinate.get_y();
