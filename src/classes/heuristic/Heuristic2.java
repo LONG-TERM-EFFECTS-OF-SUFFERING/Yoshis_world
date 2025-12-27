@@ -37,7 +37,7 @@ public class Heuristic2 extends Heuristic {
 	 * @return the difference of the number of tiles owned by the minimized player
 	 *         and the number of tiles owned by the maximized player.
 	 */
-	private float pinted_tiles_score(GameState game_state) {
+	private float painted_tiles_score(GameState game_state) {
 		return game_state.get_tiles(maximized_player).size() -
 				game_state.get_tiles(minimized_player).size();
 	}
@@ -50,6 +50,6 @@ public class Heuristic2 extends Heuristic {
 	 * @return the score for the game state.
 	 */
 	public float get_score(GameState game_state) {
-		return available_moves_score(game_state) + pinted_tiles_score(game_state);
+		return available_moves_score(game_state) + painted_tiles_score(game_state);
 	}
 }
